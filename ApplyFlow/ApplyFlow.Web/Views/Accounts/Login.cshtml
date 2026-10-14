@@ -1,0 +1,45 @@
+﻿@model ApplyFlow.Web.ViewModels.LoginViewModel
+
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Sign in";
+}
+
+<p class="eyebrow">Welcome back</p>
+<h2>Sign in to ApplyFlow</h2>
+<p class="authDescription">Pick up where you left off.</p>
+
+<form asp-controller="Accounts" asp-action="Login" method="post">
+    <input asp-for="ReturnUrl" type="hidden" />
+
+    <div asp-validation-summary="ModelOnly"
+         class="validationSummary" role="alert"></div>
+
+    <div class="authField">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" autocomplete="username" />
+        <span asp-validation-for="Email"></span>
+    </div>
+
+    <div class="authField">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" autocomplete="current-password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    <div class="rememberRow">
+        <input asp-for="RememberMe" />
+        <label asp-for="RememberMe"></label>
+    </div>
+
+    <button class="authButton" type="submit">Sign in</button>
+</form>
+
+<p class="authSwitch">
+    New to ApplyFlow?
+    <a asp-controller="Accounts" asp-action="Register">Create an account</a>
+</p>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

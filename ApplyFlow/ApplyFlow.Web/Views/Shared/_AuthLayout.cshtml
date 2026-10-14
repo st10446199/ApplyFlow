@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] | ApplyFlow</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="skipLink" href="#accountContent">Skip to form</a>
+
+    <div class="authShell">
+        <aside class="authBrand">
+            <a class="brand" asp-controller="Accounts" asp-action="Login">
+                <span class="brandMark" aria-hidden="true">
+                    A<span>↗</span>
+                </span>
+                <span>Apply<span class="brandAccent">Flow</span></span>
+            </a>
+
+            <div class="authIntroduction">
+                <p class="eyebrow">Your job search, organised</p>
+                <h1>Make every application count.</h1>
+                <p>
+                    Keep your opportunities, interview dates and next
+                    steps together as you work towards your next role.
+                </p>
+            </div>
+
+            <p class="authCopyright">
+                &copy; @DateTime.UtcNow.Year ApplyFlow
+            </p>
+        </aside>
+
+        <main id="accountContent" class="authMain" tabindex="-1">
+            <div class="authCard">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

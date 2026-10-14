@@ -1,0 +1,51 @@
+﻿.accountMenu {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.accountName {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.accountMenu form {
+    margin: 0;
+}
+
+.logoutButton {
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: white;
+    color: var(--navy);
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+    .logoutButton:hover {
+        background: #edf8f6;
+    }
+
+    .logoutButton:focus-visible {
+        outline: 3px solid var(--teal);
+        outline-offset: 3px;
+    }
+
+@media (max-width: 500px) {
+    .accountMenu {
+        gap: 8px;
+    }
+
+    .accountName {
+        max-width: 100px;
+    }
+}

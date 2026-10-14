@@ -1,0 +1,17 @@
+﻿@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Access denied";
+}
+
+<p class="eyebrow">Access denied</p>
+<h2>This page is unavailable to your account.</h2>
+
+<p class="authDescription">
+    Return to your dashboard to continue.
+</p>
+
+<a class="authButton"
+   asp-controller="Home"
+   asp-action="Index">
+    Return to dashboard
+</a>
