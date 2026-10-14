@@ -3,48 +3,85 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ApplyFlow.Web</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] | ApplyFlow</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ApplyFlow.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ApplyFlow.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+    @{
+        var isDashboard =
+            ViewContext.RouteData.Values["controller"]?.ToString() == "Home"
+            && ViewContext.RouteData.Values["action"]?.ToString() == "Index";
+    }
+
+    <a class="skipLink" href="#mainContent">Skip to content</a>
+
+    <aside class="sidebar">
+        <a class="brand" asp-controller="Home" asp-action="Index">
+            <span class="brandMark" aria-hidden="true">A<span>↗</span></span>
+            <span>Apply<span class="brandAccent">Flow</span></span>
+        </a>
+
+        <nav class="desktopNav" aria-label="Main navigation">
+            <p class="navLabel">Workspace</p>
+
+            <a class="navLink @(isDashboard ? "active" : "")"
+               asp-controller="Home"
+               asp-action="Index"
+               aria-current="@(isDashboard ? "page" : null)">
+                <span aria-hidden="true">▦</span>
+                Dashboard
+            </a>
+
+            <span class="navLink unavailable">
+                <span aria-hidden="true">▤</span>
+                Applications
+                <small>Planned</small>
+            </span>
+
+            <span class="navLink unavailable">
+                <span aria-hidden="true">▣</span>
+                Interviews
+                <small>Planned</small>
+            </span>
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+        <div class="sidebarFooter">
+            <strong>Your next opportunity starts here.</strong>
+            <p>Keep every application and next step in one place.</p>
+            <span>ApplyFlow · Portfolio preview</span>
+        </div>
+    </aside>
+
+    <div class="workspace">
+        <header class="topbar">
+            <span class="pageTitle">@ViewData["Title"]</span>
+            <span class="previewBadge">Design preview</span>
+        </header>
+
+        <details class="mobileNavigation">
+            <summary>ApplyFlow navigation</summary>
+            <nav aria-label="Mobile navigation">
+                <a asp-controller="Home" asp-action="Index"
+                   aria-current="@(isDashboard ? "page" : null)">
+                    Dashboard
+                </a>
+                <span>Applications · Planned</span>
+                <span>Interviews · Planned</span>
+            </nav>
+        </details>
+
+        <main id="mainContent" class="mainContent" tabindex="-1">
             @RenderBody()
         </main>
+
+        <footer class="pageFooter">
+            <span>&copy; @DateTime.UtcNow.Year ApplyFlow</span>
+            <span>Built with ASP.NET Core MVC</span>
+        </footer>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ApplyFlow.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

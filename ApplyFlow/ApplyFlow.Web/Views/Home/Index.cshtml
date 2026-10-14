@@ -1,8 +1,206 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section class="welcome">
+    <div>
+        <p class="eyebrow">Your job search, organised</p>
+        <h1>Every opportunity in one place.</h1>
+        <p class="muted">
+            Track your progress and keep your next step in sight.
+        </p>
+    </div>
+    <span class="stageBadge">Application tracking coming next</span>
+</section>
+
+<div class="previewNotice" role="note">
+    <strong>Sample dashboard</strong>
+    These fictional applications show the planned layout.
+    Accounts and saved records are not connected yet.
 </div>
+
+<section class="focusCard" aria-labelledby="focusTitle">
+    <div class="focusContent">
+        <span class="companyMark focusLogo" aria-hidden="true">C</span>
+        <div>
+            <p class="eyebrow">Next interview · Sample</p>
+            <h2 id="focusTitle">Get ready for Cedar Labs</h2>
+            <p>Graduate Software Developer</p>
+        </div>
+    </div>
+    <div class="focusDate">
+        <strong>22 October 2026</strong>
+        <span>10:00 SAST · Video interview</span>
+    </div>
+</section>
+
+<section class="statsGrid" aria-label="Sample application statistics">
+    <article class="statCard">
+        <span class="statIcon blue" aria-hidden="true">▤</span>
+        <div>
+            <h2>Total applications</h2>
+            <strong class="statValue">4</strong>
+            <p>All tracked opportunities</p>
+        </div>
+    </article>
+
+    <article class="statCard">
+        <span class="statIcon teal" aria-hidden="true">↗</span>
+        <div>
+            <h2>Active applications</h2>
+            <strong class="statValue">2</strong>
+            <p>Applied, assessment or interview</p>
+        </div>
+    </article>
+
+    <article class="statCard">
+        <span class="statIcon amber" aria-hidden="true">▣</span>
+        <div>
+            <h2>Upcoming interviews</h2>
+            <strong class="statValue">1</strong>
+            <p>Next: 22 October</p>
+        </div>
+    </article>
+
+    <article class="statCard">
+        <span class="statIcon green" aria-hidden="true">✓</span>
+        <div>
+            <h2>Offers</h2>
+            <strong class="statValue">1</strong>
+            <p>Ready for consideration</p>
+        </div>
+    </article>
+</section>
+
+<div class="dashboardGrid">
+    <section class="panel" aria-labelledby="statusTitle">
+        <div class="panelHeading">
+            <h2 id="statusTitle">Application status</h2>
+            <p>A snapshot of your progress</p>
+        </div>
+
+        <div class="statusSummary">
+            <strong>4</strong>
+            <span class="muted">Total tracked</span>
+        </div>
+
+        <div class="statusBar" aria-hidden="true">
+            <span class="barSaved"></span>
+            <span class="barApplied"></span>
+            <span class="barInterview"></span>
+            <span class="barOffer"></span>
+        </div>
+
+        <ul class="statusLegend" aria-label="Sample status totals">
+            <li><span class="badge saved">Saved</span><strong>1</strong></li>
+            <li><span class="badge applied">Applied</span><strong>1</strong></li>
+            <li><span class="badge interview">Interview</span><strong>1</strong></li>
+            <li><span class="badge offer">Offer</span><strong>1</strong></li>
+        </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="interviewTitle">
+        <div class="panelHeading">
+            <h2 id="interviewTitle">Upcoming interview</h2>
+            <p>Your next conversation</p>
+        </div>
+
+        <div class="interviewItem">
+            <div class="dateTile" aria-label="22 October">
+                <strong>22</strong>
+                <span>OCT</span>
+            </div>
+            <div>
+                <h3>Graduate Software Developer</h3>
+                <p class="muted">Cedar Labs · 10:00 SAST</p>
+                <span class="formatBadge">Video interview</span>
+            </div>
+        </div>
+
+        <p class="interviewTip">
+            Review your project examples and prepare questions about the role.
+        </p>
+    </section>
+</div>
+
+<section class="panel recentPanel" aria-labelledby="recentTitle">
+    <div class="panelHeading">
+        <h2 id="recentTitle">Recent applications</h2>
+        <p>Your latest opportunities</p>
+    </div>
+
+    <div class="applicationTable" role="region"
+         aria-label="Sample applications table" tabindex="0">
+        <table>
+            <caption class="visuallyHidden">
+                Four fictional job applications for the design preview
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">Company and role</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Application date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="companyCell">
+                            <span class="companyMark" aria-hidden="true">C</span>
+                            <div>
+                                <strong>Cedar Labs</strong>
+                                <span>Graduate Software Developer</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Pretoria · Hybrid</td>
+                    <td><span class="badge interview">Interview</span></td>
+                    <td><time datetime="2026-10-12">12 Oct 2026</time></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="companyCell">
+                            <span class="companyMark" aria-hidden="true">H</span>
+                            <div>
+                                <strong>Harbour Digital</strong>
+                                <span>Junior Web Developer</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Cape Town · Remote</td>
+                    <td><span class="badge applied">Applied</span></td>
+                    <td><time datetime="2026-10-10">10 Oct 2026</time></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="companyCell">
+                            <span class="companyMark" aria-hidden="true">K</span>
+                            <div>
+                                <strong>Kopano Systems</strong>
+                                <span>Software Development Intern</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Johannesburg · On site</td>
+                    <td><span class="badge saved">Saved</span></td>
+                    <td>Not applied</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="companyCell">
+                            <span class="companyMark" aria-hidden="true">F</span>
+                            <div>
+                                <strong>Fynbos Software</strong>
+                                <span>Junior C# Developer</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>Pretoria · Hybrid</td>
+                    <td><span class="badge offer">Offer</span></td>
+                    <td><time datetime="2026-10-05">5 Oct 2026</time></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
