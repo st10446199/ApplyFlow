@@ -7,6 +7,11 @@ namespace ApplyFlow.Web.Models
     {
         public int Id { get; set; }
 
+        [Required]
+        public string UserId { get; set; } = string.Empty;
+
+        public ApplicationUser User { get; set; } = null!;
+
         [Required(ErrorMessage = "Enter the company name.")]
         [StringLength(120)]
         [Display(Name = "Company name")]

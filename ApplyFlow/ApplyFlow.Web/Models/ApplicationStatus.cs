@@ -1,4 +1,4 @@
-﻿namespace ApplyFlow.Web.Models
+﻿namespace ApplyFlow.Web.Enums
 {
     public enum ApplicationStatus
     {
