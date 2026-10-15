@@ -1,0 +1,217 @@
+﻿.applicationsHeading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+    .applicationsHeading h1 {
+        margin-bottom: 10px;
+    }
+
+.applicationsPrimary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 12px 18px;
+    border-radius: 7px;
+    background: var(--teal);
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+    .applicationsPrimary:hover {
+        background: #0b5f59;
+    }
+
+    .applicationsPrimary:focus-visible {
+        outline: 3px solid var(--teal);
+        outline-offset: 4px;
+    }
+
+.applicationsSuccess {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    border: 1px solid #a8d6c2;
+    border-radius: 8px;
+    background: #eaf8f0;
+    color: #176b45;
+    overflow-wrap: anywhere;
+}
+
+.applicationsEmpty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 56px 24px;
+    text-align: center;
+}
+
+.emptyApplicationIcon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: #e7f5f3;
+    color: var(--teal);
+    font-size: 2rem;
+}
+
+.applicationsEmpty h2 {
+    font-size: 1.35rem;
+}
+
+.applicationsEmpty p {
+    max-width: 440px;
+    color: var(--muted);
+}
+
+.applicationsPanel {
+    padding: 24px;
+}
+
+.applicationsListHeading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+    .applicationsListHeading p,
+    .applicationsListHeading > span {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.875rem;
+    }
+
+.savedApplicationsTable {
+    table-layout: fixed;
+}
+
+    .savedApplicationsTable th:first-child {
+        width: 38%;
+    }
+
+    .savedApplicationsTable th:nth-child(2) {
+        width: 25%;
+    }
+
+    .savedApplicationsTable th:nth-child(3) {
+        width: 17%;
+    }
+
+    .savedApplicationsTable th:last-child {
+        width: 20%;
+    }
+
+    .savedApplicationsTable td {
+        overflow-wrap: anywhere;
+        vertical-align: middle;
+    }
+
+    .savedApplicationsTable .companyCell {
+        min-width: 0;
+    }
+
+        .savedApplicationsTable .companyCell > div {
+            min-width: 0;
+        }
+
+.badge.assessment {
+    background: #fff4df;
+    color: #875006;
+}
+
+.badge.rejected {
+    background: #fff1ef;
+    color: #a52219;
+}
+
+.badge.withdrawn {
+    background: #f1ebfa;
+    color: #694095;
+}
+
+.applicationsMobile {
+    display: none;
+}
+
+@media (max-width: 1100px) {
+    .applicationsDesktop {
+        display: none;
+    }
+
+    .applicationsMobile {
+        display: grid;
+        gap: 16px;
+    }
+
+    .savedApplicationCard {
+        padding: 20px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+    }
+
+    .savedApplicationTop {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+        .savedApplicationTop h3 {
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
+
+    .savedApplicationRole {
+        margin-top: 8px;
+        overflow-wrap: anywhere;
+    }
+
+    .savedApplicationMeta {
+        display: grid;
+        gap: 12px;
+        margin: 18px 0 0;
+    }
+
+        .savedApplicationMeta dt {
+            color: var(--muted);
+            font-size: 0.75rem;
+        }
+
+        .savedApplicationMeta dd {
+            margin: 3px 0 0;
+            font-size: 0.875rem;
+            overflow-wrap: anywhere;
+        }
+}
+
+@media (max-width: 760px) {
+    .applicationsHeading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .applicationsListHeading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .applicationsPanel {
+        padding: 18px;
+    }
+
+    .savedApplicationCard {
+        padding: 16px;
+    }
+}

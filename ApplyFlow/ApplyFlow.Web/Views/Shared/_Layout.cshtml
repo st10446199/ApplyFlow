@@ -14,9 +14,20 @@
 </head>
 <body>
     @{
+        var currentController =
+            ViewContext.RouteData.Values["controller"]?.ToString();
+
+        var currentAction =
+            ViewContext.RouteData.Values["action"]?.ToString();
+
         var isDashboard =
-            ViewContext.RouteData.Values["controller"]?.ToString() == "Home"
-            && ViewContext.RouteData.Values["action"]?.ToString() == "Index";
+            currentController == "Home" && currentAction == "Index";
+
+        var isApplicationsList =
+            currentController == "Applications" && currentAction == "Index";
+
+        var isCreateApplication =
+            currentController == "Applications" && currentAction == "Create";
 
         var currentUser = User.Identity?.IsAuthenticated == true
             ? await UserManager.GetUserAsync(User)
@@ -44,11 +55,21 @@
                 Dashboard
             </a>
 
-            <span class="navLink unavailable">
+            <a class="navLink @(isApplicationsList ? "active" : "")"
+               asp-controller="Applications"
+               asp-action="Index"
+               aria-current="@(isApplicationsList ? "page" : null)">
                 <span aria-hidden="true">▤</span>
                 Applications
-                <small>Planned</small>
-            </span>
+            </a>
+
+            <a class="navLink @(isCreateApplication ? "active" : "")"
+               asp-controller="Applications"
+               asp-action="Create"
+               aria-current="@(isCreateApplication ? "page" : null)">
+                <span aria-hidden="true">+</span>
+                Add application
+            </a>
 
             <span class="navLink unavailable">
                 <span aria-hidden="true">▣</span>
@@ -92,13 +113,26 @@
 
         <details class="mobileNavigation">
             <summary>ApplyFlow navigation</summary>
+
             <nav aria-label="Mobile navigation">
                 <a asp-controller="Home"
                    asp-action="Index"
                    aria-current="@(isDashboard ? "page" : null)">
                     Dashboard
                 </a>
-                <span>Applications · Planned</span>
+
+                <a asp-controller="Applications"
+                   asp-action="Index"
+                   aria-current="@(isApplicationsList ? "page" : null)">
+                    Applications
+                </a>
+
+                <a asp-controller="Applications"
+                   asp-action="Create"
+                   aria-current="@(isCreateApplication ? "page" : null)">
+                    Add application
+                </a>
+
                 <span>Interviews · Planned</span>
             </nav>
         </details>

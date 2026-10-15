@@ -1,0 +1,170 @@
+﻿@model List<ApplyFlow.Web.Models.JobApplication>
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Applications";
+    var displayCulture = CultureInfo.GetCultureInfo("en-ZA");
+}
+
+<link rel="stylesheet"
+      href="~/css/applications.css"
+      asp-append-version="true" />
+
+<div class="applicationsHeading">
+    <div>
+        <p class="eyebrow">Your opportunities</p>
+        <h1>Applications</h1>
+        <p class="muted">
+            Keep track of the roles you have saved and applied for.
+        </p>
+    </div>
+
+    <a class="applicationsPrimary"
+       asp-controller="Applications"
+       asp-action="Create">
+        <span aria-hidden="true">+</span>
+        Add application
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="applicationsSuccess" role="status">
+        @successMessage
+    </div>
+}
+
+@if (Model.Count == 0)
+{
+    <section class="panel applicationsEmpty">
+        <span class="emptyApplicationIcon" aria-hidden="true">▤</span>
+        <h2>Your next opportunity starts here</h2>
+        <p>
+            Add a saved vacancy or an application you have already submitted.
+        </p>
+        <a class="applicationsPrimary"
+           asp-controller="Applications"
+           asp-action="Create">
+            Add your first application
+        </a>
+    </section>
+}
+else
+{
+    <section class="panel applicationsPanel"
+             aria-labelledby="applicationsListTitle">
+        <div class="applicationsListHeading">
+            <div>
+                <h2 id="applicationsListTitle">Your applications</h2>
+                <p>
+                    @Model.Count @(Model.Count == 1 ? "opportunity" : "opportunities")
+                </p>
+            </div>
+            <span>Newest added first</span>
+        </div>
+
+        <div class="applicationsDesktop">
+            <table class="savedApplicationsTable">
+                <caption class="visuallyHidden">
+                    Your saved job applications, newest added first
+                </caption>
+
+                <thead>
+                    <tr>
+                        <th scope="col">Company and role</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Application date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var application in Model)
+                    {
+                        var companyInitial =
+                            string.IsNullOrWhiteSpace(application.CompanyName)
+                                ? "?"
+                                : StringInfo.GetNextTextElement(
+                                    application.CompanyName).ToUpperInvariant();
+
+                        var statusClass =
+                            application.Status.ToString().ToLowerInvariant();
+
+                        <tr>
+                            <td>
+                                <div class="companyCell">
+                                    <span class="companyMark" aria-hidden="true">
+                                        @companyInitial
+                                    </span>
+                                    <div>
+                                        <strong>@application.CompanyName</strong>
+                                        <span>@application.JobTitle</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@application.Location</td>
+                            <td>
+                                <span class="badge @statusClass">
+                                    @application.Status
+                                </span>
+                            </td>
+                            <td>
+                                @if (application.ApplicationDate is DateOnly date)
+                                {
+                                    <time datetime="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                                        @date.ToString("dd MMM yyyy", displayCulture)
+                                    </time>
+                                }
+                                else
+                                {
+                                    <span>Not recorded</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="applicationsMobile">
+            @foreach (var application in Model)
+            {
+                var statusClass =
+                    application.Status.ToString().ToLowerInvariant();
+
+                <article class="savedApplicationCard">
+                    <div class="savedApplicationTop">
+                        <h3>@application.CompanyName</h3>
+                        <span class="badge @statusClass">
+                            @application.Status
+                        </span>
+                    </div>
+
+                    <p class="savedApplicationRole">@application.JobTitle</p>
+
+                    <dl class="savedApplicationMeta">
+                        <div>
+                            <dt>Location</dt>
+                            <dd>@application.Location</dd>
+                        </div>
+                        <div>
+                            <dt>Application date</dt>
+                            <dd>
+                                @if (application.ApplicationDate is DateOnly date)
+                                {
+                                    <time datetime="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                                        @date.ToString("dd MMM yyyy", displayCulture)
+                                    </time>
+                                }
+                                else
+                                {
+                                    <span>Not recorded</span>
+                                }
+                            </dd>
+                        </div>
+                    </dl>
+                </article>
+            }
+        </div>
+    </section>
+}

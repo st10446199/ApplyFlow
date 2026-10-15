@@ -9,6 +9,10 @@ using Microsoft.EntityFrameworkCore;
 namespace ApplyFlow.Web.Controllers
 {
     [Authorize]
+    [ResponseCache(
+        Duration = 0,
+        Location = ResponseCacheLocation.None,
+        NoStore = true)]
     public class ApplicationsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,6 +27,28 @@ namespace ApplyFlow.Web.Controllers
             _context = context;
             _userManager = userManager;
             _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index(
+            CancellationToken cancellationToken)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user is null)
+            {
+                return Challenge();
+            }
+
+            // Filter by ownership before retrieving any application records.
+            var applications = await _context.JobApplications
+                .AsNoTracking()
+                .Where(application => application.UserId == user.Id)
+                .OrderByDescending(application => application.CreatedAt)
+                .ThenByDescending(application => application.Id)
+                .ToListAsync(cancellationToken);
+
+            return View(applications);
         }
 
         [HttpGet]
@@ -100,8 +126,7 @@ namespace ApplyFlow.Web.Controllers
                 $"Your application for {application.JobTitle} at " +
                 $"{application.CompanyName} was saved.";
 
-            // Redirect after saving so refreshing does not repeat the submission.
-            return RedirectToAction(nameof(Create));
+            return RedirectToAction(nameof(Index));
         }
     }
 }
