@@ -67,7 +67,6 @@ namespace ApplyFlow.Web.Controllers
                 return Challenge();
             }
 
-            // Check ownership in the query, including direct URL requests.
             var application = await _context.JobApplications
                 .AsNoTracking()
                 .SingleOrDefaultAsync(
@@ -109,31 +108,14 @@ namespace ApplyFlow.Web.Controllers
 
             var now = DateTimeOffset.UtcNow;
 
-            // Ownership comes from the authenticated account, never the form.
             var application = new JobApplication
             {
                 UserId = user.Id,
-                CompanyName = model.CompanyName.Trim(),
-                JobTitle = model.JobTitle.Trim(),
-                Location = model.Location.Trim(),
-                SalaryAmount = model.SalaryAmount,
-                Currency = model.SalaryAmount.HasValue
-                    ? model.Currency
-                    : null,
-                PayPeriod = model.SalaryAmount.HasValue
-                    ? model.PayPeriod
-                    : null,
-                JobUrl = string.IsNullOrWhiteSpace(model.JobUrl)
-                    ? null
-                    : model.JobUrl.Trim(),
-                ApplicationDate = model.ApplicationDate,
-                Status = model.Status!.Value,
-                Notes = string.IsNullOrWhiteSpace(model.Notes)
-                    ? null
-                    : model.Notes.Trim(),
                 CreatedAt = now,
                 UpdatedAt = now
             };
+
+            ApplyFormValues(application, model);
 
             _context.JobApplications.Add(application);
 
@@ -159,6 +141,160 @@ namespace ApplyFlow.Web.Controllers
                 $"{application.CompanyName} was saved.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(
+            int? id,
+            CancellationToken cancellationToken)
+        {
+            if (!id.HasValue || id.Value <= 0)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user is null)
+            {
+                return Challenge();
+            }
+
+            var application = await _context.JobApplications
+                .AsNoTracking()
+                .SingleOrDefaultAsync(
+                    item => item.Id == id.Value
+                        && item.UserId == user.Id,
+                    cancellationToken);
+
+            if (application is null)
+            {
+                return NotFound();
+            }
+
+            var model = new EditApplicationViewModel
+            {
+                Id = application.Id,
+                CompanyName = application.CompanyName,
+                JobTitle = application.JobTitle,
+                Location = application.Location,
+                SalaryAmount = application.SalaryAmount,
+                Currency = application.Currency,
+                PayPeriod = application.PayPeriod,
+                JobUrl = application.JobUrl,
+                ApplicationDate = application.ApplicationDate,
+                Status = application.Status,
+                Notes = application.Notes
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            [FromRoute] int id,
+            EditApplicationViewModel model,
+            CancellationToken cancellationToken)
+        {
+            if (id <= 0 || id != model.Id)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user is null)
+            {
+                return Challenge();
+            }
+
+            // Recheck ownership on submission, even if the form opened earlier.
+            var application = await _context.JobApplications
+                .SingleOrDefaultAsync(
+                    item => item.Id == id
+                        && item.UserId == user.Id,
+                    cancellationToken);
+
+            if (application is null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            ApplyFormValues(application, model);
+            application.UpdatedAt = DateTimeOffset.UtcNow;
+
+            try
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
+                _logger.LogWarning(
+                    exception,
+                    "Application {ApplicationId} was unavailable during editing.",
+                    id);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "This application could not be updated. It may have been removed. Return to your applications and check again.");
+
+                return View(model);
+            }
+            catch (DbUpdateException exception)
+            {
+                _logger.LogError(
+                    exception,
+                    "Failed to update application {ApplicationId}.",
+                    id);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "We could not save your changes. Please try again.");
+
+                return View(model);
+            }
+
+            TempData["SuccessMessage"] = "Your changes were saved.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = application.Id });
+        }
+
+        private static void ApplyFormValues(
+            JobApplication application,
+            CreateApplicationViewModel model)
+        {
+            // Only copy fields the user is allowed to change.
+            application.CompanyName = model.CompanyName.Trim();
+            application.JobTitle = model.JobTitle.Trim();
+            application.Location = model.Location.Trim();
+            application.SalaryAmount = model.SalaryAmount;
+
+            application.Currency = model.SalaryAmount.HasValue
+                ? model.Currency
+                : null;
+
+            application.PayPeriod = model.SalaryAmount.HasValue
+                ? model.PayPeriod
+                : null;
+
+            application.JobUrl = string.IsNullOrWhiteSpace(model.JobUrl)
+                ? null
+                : model.JobUrl.Trim();
+
+            application.ApplicationDate = model.ApplicationDate;
+            application.Status = model.Status!.Value;
+
+            application.Notes = string.IsNullOrWhiteSpace(model.Notes)
+                ? null
+                : model.Notes.Trim();
         }
     }
 }

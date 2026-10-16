@@ -28,7 +28,6 @@
         }
     }
 
-    // Check stored links before rendering a clickable external URL.
     var hasSafeJobUrl =
         Uri.TryCreate(Model.JobUrl, UriKind.Absolute, out var jobUri)
         && (jobUri.Scheme == Uri.UriSchemeHttp
@@ -52,14 +51,30 @@
     Back to applications
 </a>
 
-<header class="detailsHeading">
-    <p class="eyebrow">@Model.CompanyName</p>
-    <h1>@Model.JobTitle</h1>
-
-    <div class="detailsHeadingMeta">
-        <span>@Model.Location</span>
-        <span class="badge @statusClass">@Model.Status</span>
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="applicationsSuccess" role="status">
+        @successMessage
     </div>
+}
+
+<header class="detailsHeading applicationsHeading">
+    <div>
+        <p class="eyebrow">@Model.CompanyName</p>
+        <h1>@Model.JobTitle</h1>
+
+        <div class="detailsHeadingMeta">
+            <span>@Model.Location</span>
+            <span class="badge @statusClass">@Model.Status</span>
+        </div>
+    </div>
+
+    <a class="applicationsPrimary"
+       asp-controller="Applications"
+       asp-action="Edit"
+       asp-route-id="@Model.Id">
+        Edit application
+    </a>
 </header>
 
 <div class="applicationDetailsGrid">
@@ -119,7 +134,7 @@
                 <p class="detailsUrl">@Model.JobUrl</p>
 
                 <a class="applicationsPrimary"
-                   href="@jobUri!.AbsoluteUri"
+                   href="@(jobUri!.AbsoluteUri)"
                    target="_blank"
                    rel="noopener noreferrer">
                     Open job listing
