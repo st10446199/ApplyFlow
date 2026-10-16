@@ -1,0 +1,177 @@
+﻿@model ApplyFlow.Web.Models.JobApplication
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Application details";
+
+    var displayCulture = CultureInfo.GetCultureInfo("en-ZA");
+    var statusClass = Model.Status.ToString().ToLowerInvariant();
+
+    var salaryText = "Not recorded";
+
+    if (Model.SalaryAmount is decimal amount)
+    {
+        var periodText = Model.PayPeriod switch
+        {
+            "Hourly" => "hour",
+            "Monthly" => "month",
+            "Yearly" => "year",
+            _ => null
+        };
+
+        salaryText =
+            $"{Model.Currency} {amount.ToString("N2", displayCulture)}".Trim();
+
+        if (periodText is not null)
+        {
+            salaryText += $" / {periodText}";
+        }
+    }
+
+    // Check stored links before rendering a clickable external URL.
+    var hasSafeJobUrl =
+        Uri.TryCreate(Model.JobUrl, UriKind.Absolute, out var jobUri)
+        && (jobUri.Scheme == Uri.UriSchemeHttp
+            || jobUri.Scheme == Uri.UriSchemeHttps);
+
+    var createdAtUtc = Model.CreatedAt.ToUniversalTime();
+    var updatedAtUtc = Model.UpdatedAt.ToUniversalTime();
+}
+
+<link rel="stylesheet"
+      href="~/css/applications.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/applicationDetails.css"
+      asp-append-version="true" />
+
+<a class="detailsBack"
+   asp-controller="Applications"
+   asp-action="Index">
+    Back to applications
+</a>
+
+<header class="detailsHeading">
+    <p class="eyebrow">@Model.CompanyName</p>
+    <h1>@Model.JobTitle</h1>
+
+    <div class="detailsHeadingMeta">
+        <span>@Model.Location</span>
+        <span class="badge @statusClass">@Model.Status</span>
+    </div>
+</header>
+
+<div class="applicationDetailsGrid">
+    <section class="panel" aria-labelledby="informationTitle">
+        <h2 id="informationTitle">Application information</h2>
+
+        <dl class="applicationInformation">
+            <div>
+                <dt>Company</dt>
+                <dd>@Model.CompanyName</dd>
+            </div>
+
+            <div>
+                <dt>Job title</dt>
+                <dd>@Model.JobTitle</dd>
+            </div>
+
+            <div>
+                <dt>Location</dt>
+                <dd>@Model.Location</dd>
+            </div>
+
+            <div>
+                <dt>Status</dt>
+                <dd>
+                    <span class="badge @statusClass">@Model.Status</span>
+                </dd>
+            </div>
+
+            <div>
+                <dt>Application date</dt>
+                <dd>
+                    @if (Model.ApplicationDate is DateOnly date)
+                    {
+                        <time datetime="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                            @date.ToString("dd MMMM yyyy", displayCulture)
+                        </time>
+                    }
+                    else
+                    {
+                        <span>Not recorded</span>
+                    }
+                </dd>
+            </div>
+
+            <div>
+                <dt>Salary</dt>
+                <dd>@salaryText</dd>
+            </div>
+        </dl>
+
+        <div class="detailsJobLink">
+            <h3>Job listing</h3>
+
+            @if (hasSafeJobUrl)
+            {
+                <p class="detailsUrl">@Model.JobUrl</p>
+
+                <a class="applicationsPrimary"
+                   href="@jobUri!.AbsoluteUri"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Open job listing
+                    <span class="visuallyHidden">(opens in a new tab)</span>
+                    <span aria-hidden="true">↗</span>
+                </a>
+            }
+            else
+            {
+                <p class="muted">No valid job listing link recorded.</p>
+            }
+        </div>
+    </section>
+
+    <section class="panel" aria-labelledby="notesTitle">
+        <h2 id="notesTitle">Notes</h2>
+
+        @if (string.IsNullOrWhiteSpace(Model.Notes))
+        {
+            <p class="detailsEmptyNotes muted">
+                No notes recorded for this application.
+            </p>
+        }
+        else
+        {
+            <p class="detailsNotes">@Model.Notes</p>
+        }
+    </section>
+
+    <section class="panel detailsRecord" aria-labelledby="recordTitle">
+        <h2 id="recordTitle">Record information</h2>
+
+        <dl class="applicationInformation">
+            <div>
+                <dt>Added to ApplyFlow</dt>
+                <dd>
+                    <time datetime="@createdAtUtc.ToString("O", CultureInfo.InvariantCulture)">
+                        @createdAtUtc.ToString("dd MMM yyyy, HH:mm", displayCulture)
+                        UTC
+                    </time>
+                </dd>
+            </div>
+
+            <div>
+                <dt>Last updated</dt>
+                <dd>
+                    <time datetime="@updatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">
+                        @updatedAtUtc.ToString("dd MMM yyyy, HH:mm", displayCulture)
+                        UTC
+                    </time>
+                </dd>
+            </div>
+        </dl>
+    </section>
+</div>

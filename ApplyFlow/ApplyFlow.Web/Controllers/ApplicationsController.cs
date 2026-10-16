@@ -40,7 +40,6 @@ namespace ApplyFlow.Web.Controllers
                 return Challenge();
             }
 
-            // Filter by ownership before retrieving any application records.
             var applications = await _context.JobApplications
                 .AsNoTracking()
                 .Where(application => application.UserId == user.Id)
@@ -49,6 +48,39 @@ namespace ApplyFlow.Web.Controllers
                 .ToListAsync(cancellationToken);
 
             return View(applications);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(
+            int? id,
+            CancellationToken cancellationToken)
+        {
+            if (!id.HasValue || id.Value <= 0)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user is null)
+            {
+                return Challenge();
+            }
+
+            // Check ownership in the query, including direct URL requests.
+            var application = await _context.JobApplications
+                .AsNoTracking()
+                .SingleOrDefaultAsync(
+                    item => item.Id == id.Value
+                        && item.UserId == user.Id,
+                    cancellationToken);
+
+            if (application is null)
+            {
+                return NotFound();
+            }
+
+            return View(application);
         }
 
         [HttpGet]

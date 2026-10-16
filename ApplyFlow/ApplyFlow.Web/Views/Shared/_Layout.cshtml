@@ -23,11 +23,11 @@
         var isDashboard =
             currentController == "Home" && currentAction == "Index";
 
-        var isApplicationsList =
-            currentController == "Applications" && currentAction == "Index";
+        var isApplications =
+            currentController == "Applications";
 
-        var isCreateApplication =
-            currentController == "Applications" && currentAction == "Create";
+        var isApplicationsList =
+            isApplications && currentAction == "Index";
 
         var currentUser = User.Identity?.IsAuthenticated == true
             ? await UserManager.GetUserAsync(User)
@@ -55,20 +55,12 @@
                 Dashboard
             </a>
 
-            <a class="navLink @(isApplicationsList ? "active" : "")"
+            <a class="navLink @(isApplications ? "active" : "")"
                asp-controller="Applications"
                asp-action="Index"
                aria-current="@(isApplicationsList ? "page" : null)">
                 <span aria-hidden="true">▤</span>
                 Applications
-            </a>
-
-            <a class="navLink @(isCreateApplication ? "active" : "")"
-               asp-controller="Applications"
-               asp-action="Create"
-               aria-current="@(isCreateApplication ? "page" : null)">
-                <span aria-hidden="true">+</span>
-                Add application
             </a>
 
             <span class="navLink unavailable">
@@ -125,12 +117,6 @@
                    asp-action="Index"
                    aria-current="@(isApplicationsList ? "page" : null)">
                     Applications
-                </a>
-
-                <a asp-controller="Applications"
-                   asp-action="Create"
-                   aria-current="@(isCreateApplication ? "page" : null)">
-                    Add application
                 </a>
 
                 <span>Interviews · Planned</span>

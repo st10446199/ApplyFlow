@@ -66,7 +66,8 @@ else
         <div class="applicationsDesktop">
             <table class="savedApplicationsTable">
                 <caption class="visuallyHidden">
-                    Your saved job applications, newest added first
+                    Your saved job applications, newest added first.
+                    Select a company to view its application.
                 </caption>
 
                 <thead>
@@ -97,7 +98,12 @@ else
                                         @companyInitial
                                     </span>
                                     <div>
-                                        <strong>@application.CompanyName</strong>
+                                        <a asp-controller="Applications"
+                                           asp-action="Details"
+                                           asp-route-id="@application.Id"
+                                           aria-label="View @application.JobTitle at @application.CompanyName">
+                                            <strong>@application.CompanyName</strong>
+                                        </a>
                                         <span>@application.JobTitle</span>
                                     </div>
                                 </div>
@@ -160,6 +166,17 @@ else
                                 {
                                     <span>Not recorded</span>
                                 }
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Application</dt>
+                            <dd>
+                                <a asp-controller="Applications"
+                                   asp-action="Details"
+                                   asp-route-id="@application.Id"
+                                   aria-label="View @application.JobTitle at @application.CompanyName">
+                                    View details
+                                </a>
                             </dd>
                         </div>
                     </dl>
