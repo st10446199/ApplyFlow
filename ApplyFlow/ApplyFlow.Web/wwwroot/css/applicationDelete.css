@@ -1,0 +1,141 @@
+﻿.deletePanel {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+    .deletePanel h1 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+
+.deleteExplanation {
+    margin-top: 16px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.deleteSummary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    margin: 26px 0;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--background);
+}
+
+    .deleteSummary dt {
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 0.8rem;
+    }
+
+    .deleteSummary dd {
+        margin: 0;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+.deleteActions,
+.detailsActions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.deleteActions {
+    justify-content: flex-end;
+}
+
+.deleteButton,
+.deleteCancel,
+.deleteLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 12px 18px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.deleteButton {
+    background: #b42318;
+    color: white;
+}
+
+    .deleteButton:hover {
+        background: #912018;
+    }
+
+.deleteCancel {
+    background: white;
+    color: var(--navy);
+    border-color: var(--border);
+}
+
+    .deleteCancel:hover {
+        background: var(--background);
+    }
+
+.deleteLink {
+    background: #fff1ef;
+    color: #a52219;
+    border-color: #e3b1ab;
+}
+
+    .deleteLink:hover {
+        background: #ffe2dd;
+    }
+
+    .deleteButton:focus-visible,
+    .deleteCancel:focus-visible,
+    .deleteLink:focus-visible {
+        outline: 3px solid var(--teal);
+        outline-offset: 4px;
+    }
+
+.deleteErrors.validation-summary-errors {
+    margin-bottom: 20px;
+    padding: 16px;
+    border: 1px solid #e3b1ab;
+    border-radius: 8px;
+    background: #fff1ef;
+    color: #a52219;
+}
+
+.deleteErrors ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.deleteErrors.validation-summary-valid {
+    display: none;
+}
+
+@media (max-width: 760px) {
+    .deletePanel {
+        padding: 22px;
+    }
+
+    .deleteSummary {
+        grid-template-columns: 1fr;
+        padding: 18px;
+    }
+
+    .deleteActions,
+    .detailsActions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .detailsActions {
+        width: 100%;
+    }
+}

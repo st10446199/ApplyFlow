@@ -1,0 +1,68 @@
+﻿@model ApplyFlow.Web.Models.JobApplication
+
+@{
+    ViewData["Title"] = "Delete application";
+    var statusClass = Model.Status.ToString().ToLowerInvariant();
+}
+
+<link rel="stylesheet"
+      href="~/css/applications.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/applicationDelete.css"
+      asp-append-version="true" />
+
+<section class="panel deletePanel" aria-labelledby="deleteTitle">
+    <p class="eyebrow">Confirm deletion</p>
+    <h1 id="deleteTitle">Delete this application?</h1>
+
+    <p class="deleteExplanation">
+        This permanently removes the application and its saved notes.
+        You cannot undo this action.
+    </p>
+
+    <dl class="deleteSummary">
+        <div>
+            <dt>Company</dt>
+            <dd>@Model.CompanyName</dd>
+        </div>
+        <div>
+            <dt>Job title</dt>
+            <dd>@Model.JobTitle</dd>
+        </div>
+        <div>
+            <dt>Location</dt>
+            <dd>@Model.Location</dd>
+        </div>
+        <div>
+            <dt>Status</dt>
+            <dd>
+                <span class="badge @statusClass">@Model.Status</span>
+            </dd>
+        </div>
+    </dl>
+
+    <form asp-controller="Applications"
+          asp-action="Delete"
+          asp-route-id="@Model.Id"
+          method="post">
+
+        <div asp-validation-summary="ModelOnly"
+             class="deleteErrors"
+             role="alert"></div>
+
+        <div class="deleteActions">
+            <a class="deleteCancel"
+               asp-controller="Applications"
+               asp-action="Details"
+               asp-route-id="@Model.Id">
+                Keep application
+            </a>
+
+            <button class="deleteButton" type="submit">
+                Delete application
+            </button>
+        </div>
+    </form>
+</section>

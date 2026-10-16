@@ -45,6 +45,10 @@
       href="~/css/applicationDetails.css"
       asp-append-version="true" />
 
+<link rel="stylesheet"
+      href="~/css/applicationDelete.css"
+      asp-append-version="true" />
+
 <a class="detailsBack"
    asp-controller="Applications"
    asp-action="Index">
@@ -69,12 +73,21 @@
         </div>
     </div>
 
-    <a class="applicationsPrimary"
-       asp-controller="Applications"
-       asp-action="Edit"
-       asp-route-id="@Model.Id">
-        Edit application
-    </a>
+    <div class="detailsActions">
+        <a class="applicationsPrimary"
+           asp-controller="Applications"
+           asp-action="Edit"
+           asp-route-id="@Model.Id">
+            Edit application
+        </a>
+
+        <a class="deleteLink"
+           asp-controller="Applications"
+           asp-action="Delete"
+           asp-route-id="@Model.Id">
+            Delete
+        </a>
+    </div>
 </header>
 
 <div class="applicationDetailsGrid">

@@ -1,5 +1,171 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ApplyFlow.Web.ViewModels.EditApplicationViewModel
+@using ApplyFlow.Web.Enums
+
 @{
+    ViewData["Title"] = "Edit application";
+}
+
+<link rel="stylesheet"
+      href="~/css/applicationForm.css"
+      asp-append-version="true" />
+
+<div class="applicationHeading">
+    <a asp-controller="Applications"
+       asp-action="Details"
+       asp-route-id="@Model.Id">
+        Back to application
+    </a>
+
+    <p class="eyebrow">Keep your progress up to date</p>
+    <h1>Edit application</h1>
+    <p class="muted">
+        Update the opportunity details, status or notes.
+    </p>
+</div>
+
+<form asp-controller="Applications"
+      asp-action="Edit"
+      asp-route-id="@Model.Id"
+      method="post"
+      class="applicationForm">
+
+    <input asp-for="Id" type="hidden" />
+
+    <div asp-validation-summary="All"
+         class="applicationErrors"
+         role="alert"></div>
+
+    <p class="requiredNotice">
+        Fields marked with * are required.
+    </p>
+
+    <fieldset class="applicationSection">
+        <legend>Role information</legend>
+
+        <div class="applicationFields">
+            <div class="applicationField">
+                <label asp-for="CompanyName">Company name *</label>
+                <input asp-for="CompanyName" required />
+                <span asp-validation-for="CompanyName"></span>
+            </div>
+
+            <div class="applicationField">
+                <label asp-for="JobTitle">Job title *</label>
+                <input asp-for="JobTitle" required />
+                <span asp-validation-for="JobTitle"></span>
+            </div>
+
+            <div class="applicationField">
+                <label asp-for="Location">Location *</label>
+                <input asp-for="Location" required />
+                <span asp-validation-for="Location"></span>
+            </div>
+
+            <div class="applicationField">
+                <label asp-for="JobUrl"></label>
+                <input asp-for="JobUrl"
+                       type="url"
+                       aria-describedby="jobUrlHelp" />
+                <small id="jobUrlHelp">
+                    Optional link to the vacancy.
+                </small>
+                <span asp-validation-for="JobUrl"></span>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="applicationSection">
+        <legend>Salary details</legend>
+
+        <p class="sectionDescription">
+            Optional. Clear the amount if the salary is unknown.
+        </p>
+
+        <div class="applicationFields salaryFields">
+            <div class="applicationField">
+                <label asp-for="SalaryAmount"></label>
+                <input asp-for="SalaryAmount"
+                       type="number"
+                       min="0.01"
+                       max="999999999.99"
+                       step="0.01" />
+                <span asp-validation-for="SalaryAmount"></span>
+            </div>
+
+            <div class="applicationField">
+                <label asp-for="Currency"></label>
+                <select asp-for="Currency">
+                    <option value="">Choose currency</option>
+                    <option value="ZAR">ZAR · South African rand</option>
+                    <option value="USD">USD · US dollar</option>
+                    <option value="GBP">GBP · British pound</option>
+                    <option value="EUR">EUR · Euro</option>
+                </select>
+                <span asp-validation-for="Currency"></span>
+            </div>
+
+            <div class="applicationField">
+                <label asp-for="PayPeriod"></label>
+                <select asp-for="PayPeriod">
+                    <option value="">Choose pay period</option>
+                    <option value="Hourly">Hourly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Yearly">Yearly</option>
+                </select>
+                <span asp-validation-for="PayPeriod"></span>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="applicationSection">
+        <legend>Application progress</legend>
+
+        <div class="applicationFields">
+            <div class="applicationField">
+                <label asp-for="Status">Status *</label>
+                <select asp-for="Status"
+                        asp-items="Html.GetEnumSelectList<ApplicationStatus>()"
+                        required>
+                    <option value="">Choose status</option>
+                </select>
+                <span asp-validation-for="Status"></span>
+            </div>
+
+            <div class="applicationField">
+                <label asp-for="ApplicationDate"></label>
+                <input asp-for="ApplicationDate"
+                       type="date"
+                       aria-describedby="applicationDateHelp" />
+                <small id="applicationDateHelp">
+                    Leave empty if you have not applied or do not know the date.
+                </small>
+                <span asp-validation-for="ApplicationDate"></span>
+            </div>
+
+            <div class="applicationField fullWidth">
+                <label asp-for="Notes"></label>
+                <textarea asp-for="Notes"
+                          rows="5"
+                          maxlength="5000"></textarea>
+                <span asp-validation-for="Notes"></span>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="applicationActions">
+        <a class="applicationCancel"
+           asp-controller="Applications"
+           asp-action="Details"
+           asp-route-id="@Model.Id">
+            Cancel
+        </a>
+
+        <button class="applicationSubmit" type="submit">
+            Save changes
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

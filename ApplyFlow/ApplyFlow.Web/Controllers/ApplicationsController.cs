@@ -209,7 +209,6 @@ namespace ApplyFlow.Web.Controllers
                 return Challenge();
             }
 
-            // Recheck ownership on submission, even if the form opened earlier.
             var application = await _context.JobApplications
                 .SingleOrDefaultAsync(
                     item => item.Id == id
@@ -265,6 +264,100 @@ namespace ApplyFlow.Web.Controllers
             return RedirectToAction(
                 nameof(Details),
                 new { id = application.Id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(
+            int? id,
+            CancellationToken cancellationToken)
+        {
+            if (!id.HasValue || id.Value <= 0)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user is null)
+            {
+                return Challenge();
+            }
+
+            var application = await _context.JobApplications
+                .AsNoTracking()
+                .SingleOrDefaultAsync(
+                    item => item.Id == id.Value
+                        && item.UserId == user.Id,
+                    cancellationToken);
+
+            if (application is null)
+            {
+                return NotFound();
+            }
+
+            return View(application);
+        }
+
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(
+            [FromRoute] int id,
+            CancellationToken cancellationToken)
+        {
+            if (id <= 0)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user is null)
+            {
+                return Challenge();
+            }
+
+            // Reload the owned record instead of trusting submitted record data.
+            var application = await _context.JobApplications
+                .SingleOrDefaultAsync(
+                    item => item.Id == id
+                        && item.UserId == user.Id,
+                    cancellationToken);
+
+            if (application is null)
+            {
+                return NotFound();
+            }
+
+            _context.JobApplications.Remove(application);
+
+            try
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+            catch (DbUpdateException exception)
+            {
+                _logger.LogError(
+                    exception,
+                    "Failed to delete application {ApplicationId}.",
+                    id);
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "We could not delete this application. Please try again.");
+
+                return View("Delete", application);
+            }
+
+            TempData["SuccessMessage"] =
+                $"Your application for {application.JobTitle} at " +
+                $"{application.CompanyName} was deleted.";
+
+            return RedirectToAction(nameof(Index));
         }
 
         private static void ApplyFormValues(
