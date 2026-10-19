@@ -1,0 +1,152 @@
+﻿.applicationFilterPanel {
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+    .applicationFilterPanel h2 {
+        margin: 0 0 18px;
+        font-size: 1.05rem;
+    }
+
+.applicationFilterForm {
+    display: grid;
+    grid-template-columns: minmax(200px, 2fr) minmax(140px, 1fr) minmax(180px, 1fr) auto;
+    align-items: end;
+    gap: 16px;
+}
+
+.applicationFilterField {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+    .applicationFilterField label {
+        color: #172033;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .applicationFilterField input,
+    .applicationFilterField select {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        background: white;
+        color: #172033;
+        font: inherit;
+        font-size: 0.875rem;
+    }
+
+        .applicationFilterField input::placeholder {
+            color: #64748b;
+        }
+
+        .applicationFilterField input:focus-visible,
+        .applicationFilterField select:focus-visible {
+            border-color: var(--teal);
+            outline: 3px solid #b8e4de;
+            outline-offset: 2px;
+        }
+
+.applicationFilterActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .applicationFilterActions button {
+        border: 0;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+.applicationSecondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 46px;
+    padding: 10px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: white;
+    color: #172033;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+a.applicationSecondary:hover {
+    border-color: var(--teal);
+    background: #eef8f6;
+    color: #0b5f59;
+}
+
+.applicationSecondary:focus-visible {
+    outline: 3px solid var(--teal);
+    outline-offset: 3px;
+}
+
+.applicationPagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.applicationPageSummary {
+    color: var(--muted);
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.applicationPageDisabled {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    cursor: default;
+}
+
+@media (max-width: 1200px) {
+    .applicationFilterForm {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .applicationFilterActions {
+        min-height: 46px;
+    }
+}
+
+@media (max-width: 600px) {
+    .applicationFilterPanel {
+        padding: 18px;
+    }
+
+    .applicationFilterForm {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .applicationFilterActions > * {
+        flex: 1;
+    }
+
+    .applicationPagination {
+        flex-wrap: wrap;
+    }
+
+    .applicationPageSummary {
+        order: -1;
+        width: 100%;
+    }
+}

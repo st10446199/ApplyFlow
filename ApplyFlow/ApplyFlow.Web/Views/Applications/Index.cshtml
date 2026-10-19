@@ -1,4 +1,5 @@
-﻿@model List<ApplyFlow.Web.Models.JobApplication>
+﻿@model ApplyFlow.Web.ViewModels.ApplicationListViewModel
+@using ApplyFlow.Web.Enums
 @using System.Globalization
 
 @{
@@ -8,6 +9,10 @@
 
 <link rel="stylesheet"
       href="~/css/applications.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/applicationFilters.css"
       asp-append-version="true" />
 
 <div class="applicationsHeading">
@@ -34,7 +39,7 @@
     </div>
 }
 
-@if (Model.Count == 0)
+@if (Model.TotalApplications == 0)
 {
     <section class="panel applicationsEmpty">
         <span class="emptyApplicationIcon" aria-hidden="true">▤</span>
@@ -51,137 +56,262 @@
 }
 else
 {
-    <section class="panel applicationsPanel"
-             aria-labelledby="applicationsListTitle">
-        <div class="applicationsListHeading">
-            <div>
-                <h2 id="applicationsListTitle">Your applications</h2>
-                <p>
-                    @Model.Count @(Model.Count == 1 ? "opportunity" : "opportunities")
-                </p>
+    <section class="panel applicationFilterPanel"
+             aria-labelledby="applicationFilterTitle">
+        <h2 id="applicationFilterTitle">Find an application</h2>
+
+        <form asp-controller="Applications"
+              asp-action="Index"
+              method="get"
+              class="applicationFilterForm"
+              role="search"
+              aria-label="Search your applications">
+
+            <div class="applicationFilterField applicationSearchField">
+                <label asp-for="Search">Search</label>
+                <input asp-for="Search"
+                       type="search"
+                       maxlength="200"
+                       placeholder="Company, job title or location" />
             </div>
-            <span>Newest added first</span>
-        </div>
 
-        <div class="applicationsDesktop">
-            <table class="savedApplicationsTable">
-                <caption class="visuallyHidden">
-                    Your saved job applications, newest added first.
-                    Select a company to view its application.
-                </caption>
+            <div class="applicationFilterField">
+                <label asp-for="Status">Status</label>
+                <select asp-for="Status"
+                        asp-items="Html.GetEnumSelectList<ApplicationStatus>()">
+                    <option value="">All statuses</option>
+                </select>
+            </div>
 
-                <thead>
-                    <tr>
-                        <th scope="col">Company and role</th>
-                        <th scope="col">Location</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Application date</th>
-                    </tr>
-                </thead>
+            <div class="applicationFilterField">
+                <label asp-for="Sort">Sort by</label>
+                <select asp-for="Sort">
+                    <option value="newest">Newest added</option>
+                    <option value="oldest">Oldest added</option>
+                    <option value="company">Company A to Z</option>
+                    <option value="applicationDate">Latest application date</option>
+                </select>
+            </div>
 
-                <tbody>
-                    @foreach (var application in Model)
-                    {
-                        var companyInitial =
-                            string.IsNullOrWhiteSpace(application.CompanyName)
-                                ? "?"
-                                : StringInfo.GetNextTextElement(
-                                    application.CompanyName).ToUpperInvariant();
+            <div class="applicationFilterActions">
+                <button type="submit" class="applicationsPrimary">
+                    Apply
+                </button>
 
-                        var statusClass =
-                            application.Status.ToString().ToLowerInvariant();
-
-                        <tr>
-                            <td>
-                                <div class="companyCell">
-                                    <span class="companyMark" aria-hidden="true">
-                                        @companyInitial
-                                    </span>
-                                    <div>
-                                        <a asp-controller="Applications"
-                                           asp-action="Details"
-                                           asp-route-id="@application.Id"
-                                           aria-label="View @application.JobTitle at @application.CompanyName">
-                                            <strong>@application.CompanyName</strong>
-                                        </a>
-                                        <span>@application.JobTitle</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>@application.Location</td>
-                            <td>
-                                <span class="badge @statusClass">
-                                    @application.Status
-                                </span>
-                            </td>
-                            <td>
-                                @if (application.ApplicationDate is DateOnly date)
-                                {
-                                    <time datetime="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
-                                        @date.ToString("dd MMM yyyy", displayCulture)
-                                    </time>
-                                }
-                                else
-                                {
-                                    <span>Not recorded</span>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-
-        <div class="applicationsMobile">
-            @foreach (var application in Model)
-            {
-                var statusClass =
-                    application.Status.ToString().ToLowerInvariant();
-
-                <article class="savedApplicationCard">
-                    <div class="savedApplicationTop">
-                        <h3>@application.CompanyName</h3>
-                        <span class="badge @statusClass">
-                            @application.Status
-                        </span>
-                    </div>
-
-                    <p class="savedApplicationRole">@application.JobTitle</p>
-
-                    <dl class="savedApplicationMeta">
-                        <div>
-                            <dt>Location</dt>
-                            <dd>@application.Location</dd>
-                        </div>
-                        <div>
-                            <dt>Application date</dt>
-                            <dd>
-                                @if (application.ApplicationDate is DateOnly date)
-                                {
-                                    <time datetime="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
-                                        @date.ToString("dd MMM yyyy", displayCulture)
-                                    </time>
-                                }
-                                else
-                                {
-                                    <span>Not recorded</span>
-                                }
-                            </dd>
-                        </div>
-                        <div>
-                            <dt>Application</dt>
-                            <dd>
-                                <a asp-controller="Applications"
-                                   asp-action="Details"
-                                   asp-route-id="@application.Id"
-                                   aria-label="View @application.JobTitle at @application.CompanyName">
-                                    View details
-                                </a>
-                            </dd>
-                        </div>
-                    </dl>
-                </article>
-            }
-        </div>
+                <a asp-controller="Applications"
+                   asp-action="Index"
+                   class="applicationSecondary">
+                    Clear
+                </a>
+            </div>
+        </form>
     </section>
+
+    @if (Model.TotalCount == 0)
+    {
+        <section class="panel applicationsEmpty">
+            <h2>No matching applications</h2>
+            <p>
+                Try a different search or status, or clear your filters
+                to see all your applications.
+            </p>
+
+            <a asp-controller="Applications"
+               asp-action="Index"
+               class="applicationsPrimary">
+                Clear filters
+            </a>
+        </section>
+    }
+    else
+    {
+        <section class="panel applicationsPanel"
+                 aria-labelledby="applicationsListTitle">
+            <div class="applicationsListHeading">
+                <div>
+                    <h2 id="applicationsListTitle">Your applications</h2>
+                    <p>
+                        Showing @Model.FirstResult to @Model.LastResult
+                        of @Model.TotalCount
+                        @(Model.TotalCount == 1 ? "application" : "applications")
+                    </p>
+                </div>
+                <span>@Model.SortLabel</span>
+            </div>
+
+            <div class="applicationsDesktop">
+                <table class="savedApplicationsTable">
+                    <caption class="visuallyHidden">
+                        Your matching applications. @Model.SortLabel.
+                        Select a company to view its application.
+                    </caption>
+
+                    <thead>
+                        <tr>
+                            <th scope="col">Company and role</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Application date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var application in Model.Applications)
+                        {
+                            var companyInitial =
+                                string.IsNullOrWhiteSpace(application.CompanyName)
+                                    ? "?"
+                                    : StringInfo.GetNextTextElement(
+                                        application.CompanyName).ToUpperInvariant();
+
+                            var statusClass =
+                                application.Status.ToString().ToLowerInvariant();
+
+                            <tr>
+                                <td>
+                                    <div class="companyCell">
+                                        <span class="companyMark" aria-hidden="true">
+                                            @companyInitial
+                                        </span>
+                                        <div>
+                                            <a asp-controller="Applications"
+                                               asp-action="Details"
+                                               asp-route-id="@application.Id"
+                                               aria-label="View @application.JobTitle at @application.CompanyName">
+                                                <strong>@application.CompanyName</strong>
+                                            </a>
+                                            <span>@application.JobTitle</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@application.Location</td>
+                                <td>
+                                    <span class="badge @statusClass">
+                                        @application.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (application.ApplicationDate is DateOnly date)
+                                    {
+                                        <time datetime="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                                            @date.ToString("dd MMM yyyy", displayCulture)
+                                        </time>
+                                    }
+                                    else
+                                    {
+                                        <span>Not recorded</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="applicationsMobile">
+                @foreach (var application in Model.Applications)
+                {
+                    var statusClass =
+                        application.Status.ToString().ToLowerInvariant();
+
+                    <article class="savedApplicationCard">
+                        <div class="savedApplicationTop">
+                            <h3>@application.CompanyName</h3>
+                            <span class="badge @statusClass">
+                                @application.Status
+                            </span>
+                        </div>
+
+                        <p class="savedApplicationRole">@application.JobTitle</p>
+
+                        <dl class="savedApplicationMeta">
+                            <div>
+                                <dt>Location</dt>
+                                <dd>@application.Location</dd>
+                            </div>
+                            <div>
+                                <dt>Application date</dt>
+                                <dd>
+                                    @if (application.ApplicationDate is DateOnly date)
+                                    {
+                                        <time datetime="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                                            @date.ToString("dd MMM yyyy", displayCulture)
+                                        </time>
+                                    }
+                                    else
+                                    {
+                                        <span>Not recorded</span>
+                                    }
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>Application</dt>
+                                <dd>
+                                    <a asp-controller="Applications"
+                                       asp-action="Details"
+                                       asp-route-id="@application.Id"
+                                       aria-label="View @application.JobTitle at @application.CompanyName">
+                                        View details
+                                    </a>
+                                </dd>
+                            </div>
+                        </dl>
+                    </article>
+                }
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="applicationPagination"
+                     aria-label="Application pages">
+
+                    @if (Model.HasPreviousPage)
+                    {
+                        <a asp-controller="Applications"
+                           asp-action="Index"
+                           asp-route-search="@Model.Search"
+                           asp-route-status="@Model.Status"
+                           asp-route-sort="@Model.Sort"
+                           asp-route-page="@(Model.Page - 1)"
+                           class="applicationSecondary"
+                           rel="prev">
+                            Previous
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="applicationSecondary applicationPageDisabled"
+                              aria-disabled="true">
+                            Previous
+                        </span>
+                    }
+
+                    <span class="applicationPageSummary">
+                        Page @Model.Page of @Model.TotalPages
+                    </span>
+
+                    @if (Model.HasNextPage)
+                    {
+                        <a asp-controller="Applications"
+                           asp-action="Index"
+                           asp-route-search="@Model.Search"
+                           asp-route-status="@Model.Status"
+                           asp-route-sort="@Model.Sort"
+                           asp-route-page="@(Model.Page + 1)"
+                           class="applicationSecondary"
+                           rel="next">
+                            Next
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="applicationSecondary applicationPageDisabled"
+                              aria-disabled="true">
+                            Next
+                        </span>
+                    }
+                </nav>
+            }
+        </section>
+    }
 }

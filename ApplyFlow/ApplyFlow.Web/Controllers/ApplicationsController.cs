@@ -1,4 +1,5 @@
 ﻿using ApplyFlow.Web.Data;
+using ApplyFlow.Web.Enums;
 using ApplyFlow.Web.Models;
 using ApplyFlow.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +32,11 @@ namespace ApplyFlow.Web.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Index(
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            string? search = null,
+            string? status = null,
+            string? sort = null,
+            int page = 1)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -40,14 +45,110 @@ namespace ApplyFlow.Web.Controllers
                 return Challenge();
             }
 
-            var applications = await _context.JobApplications
+            var searchTerm = search?.Trim() ?? string.Empty;
+
+            if (searchTerm.Length > 200)
+            {
+                searchTerm = searchTerm[..200];
+            }
+
+            ApplicationStatus? selectedStatus = null;
+
+            if (Enum.TryParse<ApplicationStatus>(
+                    status,
+                    ignoreCase: true,
+                    out var parsedStatus)
+                && Enum.IsDefined(typeof(ApplicationStatus), parsedStatus))
+            {
+                selectedStatus = parsedStatus;
+            }
+
+            var selectedSort = sort switch
+            {
+                "oldest" => "oldest",
+                "company" => "company",
+                "applicationDate" => "applicationDate",
+                _ => "newest"
+            };
+
+            // Every query starts with the signed-in user's records.
+            var query = _context.JobApplications
                 .AsNoTracking()
-                .Where(application => application.UserId == user.Id)
-                .OrderByDescending(application => application.CreatedAt)
-                .ThenByDescending(application => application.Id)
+                .Where(application => application.UserId == user.Id);
+
+            var totalApplications = await query.CountAsync(cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(application =>
+                    application.CompanyName.Contains(searchTerm)
+                    || application.JobTitle.Contains(searchTerm)
+                    || application.Location.Contains(searchTerm));
+            }
+
+            if (selectedStatus.HasValue)
+            {
+                var statusValue = selectedStatus.Value;
+
+                query = query.Where(application =>
+                    application.Status == statusValue);
+            }
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            const int pageSize = 10;
+
+            var totalPages = Math.Max(
+                1,
+                (int)Math.Ceiling(totalCount / (double)pageSize));
+
+            page = Math.Clamp(page, 1, totalPages);
+
+            // The ID gives records with equal values a consistent order.
+            var orderedQuery = selectedSort switch
+            {
+                "oldest" => query
+                    .OrderBy(application => application.CreatedAt)
+                    .ThenBy(application => application.Id),
+
+                "company" => query
+                    .OrderBy(application => application.CompanyName)
+                    .ThenBy(application => application.JobTitle)
+                    .ThenBy(application => application.Id),
+
+                "applicationDate" => query
+                    .OrderByDescending(application =>
+                        application.ApplicationDate.HasValue)
+                    .ThenByDescending(application =>
+                        application.ApplicationDate)
+                    .ThenByDescending(application => application.Id),
+
+                _ => query
+                    .OrderByDescending(application => application.CreatedAt)
+                    .ThenByDescending(application => application.Id)
+            };
+
+            var applications = await orderedQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
-            return View(applications);
+            var model = new ApplicationListViewModel
+            {
+                Applications = applications,
+                Search = searchTerm,
+                Status = selectedStatus,
+                Sort = selectedSort,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalApplications = totalApplications
+            };
+
+            // Display the normalized filters, including safe URL fallbacks.
+            ModelState.Clear();
+
+            return View(model);
         }
 
         [HttpGet]
