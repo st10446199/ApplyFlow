@@ -1,0 +1,132 @@
+﻿.interviewSchedulePanel,
+.interviewListPanel {
+    margin-bottom: 24px;
+}
+
+    .interviewSchedulePanel > p {
+        margin-top: 8px;
+    }
+
+.interviewSelectionForm {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+    .interviewSelectionForm .applicationField {
+        flex: 1;
+    }
+
+    .interviewSelectionForm button {
+        flex-shrink: 0;
+    }
+
+.interviewList {
+    padding: 0;
+    margin: 20px 0 0;
+    list-style: none;
+}
+
+.interviewRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+}
+
+    .interviewRow:last-child {
+        padding-bottom: 0;
+    }
+
+    .interviewRow > a {
+        flex-shrink: 0;
+    }
+
+.interviewRecord {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+    .interviewRecord h3 a {
+        color: var(--navy);
+    }
+
+        .interviewRecord h3 a:hover {
+            color: var(--teal);
+        }
+
+    .interviewRecord p {
+        color: var(--muted);
+    }
+
+    .interviewRecord time {
+        color: var(--teal);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+.interviewEmpty {
+    margin-top: 20px;
+    color: var(--muted);
+}
+
+.interviewApplicationName {
+    overflow-wrap: anywhere;
+}
+
+.interviewRemove {
+    padding: 18px;
+    margin-top: 24px;
+    border: 1px solid #e3b1ab;
+    border-radius: 8px;
+    background: #fff8f7;
+}
+
+.interviewRemoveLabel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    font-weight: 600;
+}
+
+    .interviewRemoveLabel input {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        accent-color: var(--teal);
+    }
+
+        .interviewRemoveLabel input:focus-visible {
+            outline: 3px solid var(--teal);
+            outline-offset: 3px;
+        }
+
+.interviewRemove p,
+.interviewFormNote {
+    color: var(--muted);
+    font-size: 0.875rem;
+}
+
+.interviewRemove p {
+    margin-top: 8px;
+}
+
+.interviewFormNote {
+    margin-top: 24px;
+}
+
+@media (max-width: 760px) {
+    .interviewSelectionForm,
+    .interviewRow {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

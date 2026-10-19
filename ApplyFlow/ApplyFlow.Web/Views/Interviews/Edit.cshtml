@@ -1,0 +1,102 @@
+﻿@model ApplyFlow.Web.ViewModels.EditInterviewViewModel
+
+@{
+    ViewData["Title"] = "Manage interview";
+}
+
+<link rel="stylesheet"
+      href="~/css/applicationForm.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/interviews.css"
+      asp-append-version="true" />
+
+<div class="applicationHeading">
+    <a asp-controller="Interviews" asp-action="Index">
+        Back to interviews
+    </a>
+
+    <p class="eyebrow">Interview scheduling</p>
+    <h1>Manage interview</h1>
+    <p class="muted interviewApplicationName">
+        @Model.JobTitle at @Model.CompanyName
+    </p>
+</div>
+
+<form asp-controller="Interviews"
+      asp-action="Edit"
+      asp-route-id="@Model.Id"
+      method="post"
+      class="applicationForm">
+
+    <input asp-for="Id" type="hidden" />
+
+    <div asp-validation-summary="All"
+         class="applicationErrors"
+         role="alert"></div>
+
+    <fieldset class="applicationSection">
+        <legend>Interview date</legend>
+
+        <p class="sectionDescription">
+            Enter the date and time in South African Standard Time,
+            SAST (UTC+02:00). Saving a new date replaces the existing date.
+        </p>
+
+        <div class="applicationField">
+            <label asp-for="InterviewLocalTime"></label>
+
+            <input asp-for="InterviewLocalTime"
+                   asp-format="{0:yyyy-MM-ddTHH:mm}"
+                   type="datetime-local"
+                   min="2000-01-01T00:00"
+                   max="2100-12-31T23:59"
+                   step="60"
+                   aria-describedby="interviewTimeHelp" />
+
+            <span asp-validation-for="InterviewLocalTime"></span>
+
+            <small id="interviewTimeHelp">
+                Use the interview's SAST time, even if your device
+                is set to a different time zone.
+            </small>
+        </div>
+
+        @if (Model.HasScheduledInterview)
+        {
+            <div class="interviewRemove">
+                <label class="interviewRemoveLabel">
+                    <input asp-for="RemoveInterview" />
+                    <span>Remove the scheduled interview</span>
+                </label>
+
+                <p>
+                    Tick this box and save to remove the date.
+                    Your job application will be kept.
+                </p>
+            </div>
+        }
+
+        <p class="interviewFormNote">
+            This records the date only. It does not send invitations
+            or reminders, or change the application's status.
+        </p>
+    </fieldset>
+
+    <div class="applicationActions">
+        <a class="applicationCancel"
+           asp-controller="Interviews"
+           asp-action="Index">
+            Cancel
+        </a>
+
+        <button class="applicationSubmit" type="submit">
+            Save changes
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

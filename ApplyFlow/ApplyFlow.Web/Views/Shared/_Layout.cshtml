@@ -23,11 +23,15 @@
         var isDashboard =
             currentController == "Home" && currentAction == "Index";
 
-        var isApplications =
-            currentController == "Applications";
+        var isApplications = currentController == "Applications";
 
         var isApplicationsList =
             isApplications && currentAction == "Index";
+
+        var isInterviews = currentController == "Interviews";
+
+        var isInterviewsList =
+            isInterviews && currentAction == "Index";
 
         var currentUser = User.Identity?.IsAuthenticated == true
             ? await UserManager.GetUserAsync(User)
@@ -63,11 +67,13 @@
                 Applications
             </a>
 
-            <span class="navLink unavailable">
+            <a class="navLink @(isInterviews ? "active" : "")"
+               asp-controller="Interviews"
+               asp-action="Index"
+               aria-current="@(isInterviewsList ? "page" : null)">
                 <span aria-hidden="true">▣</span>
                 Interviews
-                <small>Planned</small>
-            </span>
+            </a>
         </nav>
 
         <div class="sidebarFooter">
@@ -119,7 +125,11 @@
                     Applications
                 </a>
 
-                <span>Interviews · Planned</span>
+                <a asp-controller="Interviews"
+                   asp-action="Index"
+                   aria-current="@(isInterviewsList ? "page" : null)">
+                    Interviews
+                </a>
             </nav>
         </details>
 

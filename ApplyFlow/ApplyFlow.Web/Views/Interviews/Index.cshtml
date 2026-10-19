@@ -1,0 +1,189 @@
+﻿@model ApplyFlow.Web.ViewModels.InterviewListViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Interviews";
+    var displayCulture = CultureInfo.GetCultureInfo("en-ZA");
+    var southAfricaOffset = TimeSpan.FromHours(2);
+}
+
+<link rel="stylesheet"
+      href="~/css/applications.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/applicationForm.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/interviews.css"
+      asp-append-version="true" />
+
+<div class="applicationsHeading">
+    <div>
+        <p class="eyebrow">Prepare for your next conversation</p>
+        <h1>Interviews</h1>
+        <p class="muted">
+            Manage one interview date per application.
+            All times are shown in SAST (UTC+02:00).
+        </p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="applicationsSuccess" role="status">
+        @successMessage
+    </div>
+}
+
+@if (Model.Applications.Count == 0)
+{
+    <section class="panel applicationsEmpty">
+        <h2>Add an application first</h2>
+        <p>
+            Interview dates belong to your job applications.
+            Create an application before scheduling an interview.
+        </p>
+
+        <a class="applicationsPrimary"
+           asp-controller="Applications"
+           asp-action="Create">
+            Add application
+        </a>
+    </section>
+}
+else
+{
+    <section class="panel interviewSchedulePanel"
+             aria-labelledby="scheduleTitle">
+        <h2 id="scheduleTitle">Schedule or manage an interview</h2>
+        <p class="muted">
+            Choose the application you want to update.
+        </p>
+
+        <form asp-controller="Interviews"
+              asp-action="Edit"
+              method="get"
+              class="interviewSelectionForm">
+            <div class="applicationField">
+                <label for="applicationId">Application</label>
+                <select id="applicationId"
+                        name="id"
+                        asp-items="Model.Applications"
+                        required>
+                    <option value="">Select an application</option>
+                </select>
+            </div>
+
+            <button type="submit" class="applicationSubmit">
+                Continue
+            </button>
+        </form>
+    </section>
+
+    <section class="panel interviewListPanel"
+             aria-labelledby="upcomingTitle">
+        <div class="panelHeading">
+            <h2 id="upcomingTitle">Upcoming interviews</h2>
+            <p>@Model.UpcomingInterviews.Count scheduled</p>
+        </div>
+
+        @if (Model.UpcomingInterviews.Count == 0)
+        {
+            <p class="interviewEmpty">
+                No upcoming interviews. Select an application above
+                when you have a date to record.
+            </p>
+        }
+        else
+        {
+            <ul class="interviewList">
+                @foreach (var application in Model.UpcomingInterviews)
+                {
+                    var interviewTime = application.InterviewAt!.Value
+                        .ToOffset(southAfricaOffset);
+
+                    <li class="interviewRow">
+                        <div class="interviewRecord">
+                            <h3>
+                                <a asp-controller="Applications"
+                                   asp-action="Details"
+                                   asp-route-id="@application.Id">
+                                    @application.CompanyName
+                                </a>
+                            </h3>
+                            <p>@application.JobTitle</p>
+                            <time datetime="@interviewTime.ToString("O", CultureInfo.InvariantCulture)">
+                                @interviewTime.ToString("dd MMM yyyy", displayCulture)
+                                at @interviewTime.ToString("HH:mm", displayCulture) SAST
+                            </time>
+                            <span class="badge @application.Status.ToString().ToLowerInvariant()">
+                                @application.Status
+                            </span>
+                        </div>
+
+                        <a class="applicationCancel"
+                           asp-controller="Interviews"
+                           asp-action="Edit"
+                           asp-route-id="@application.Id"
+                           aria-label="Manage interview at @application.CompanyName for @application.JobTitle">
+                            Manage
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+
+    <section class="panel interviewListPanel"
+             aria-labelledby="pastTitle">
+        <div class="panelHeading">
+            <h2 id="pastTitle">Past interview dates</h2>
+            <p>
+                Your 10 most recent past dates.
+                A past date does not confirm that an interview took place.
+            </p>
+        </div>
+
+        @if (Model.PastInterviews.Count == 0)
+        {
+            <p class="interviewEmpty">No past interview dates recorded.</p>
+        }
+        else
+        {
+            <ul class="interviewList">
+                @foreach (var application in Model.PastInterviews)
+                {
+                    var interviewTime = application.InterviewAt!.Value
+                        .ToOffset(southAfricaOffset);
+
+                    <li class="interviewRow">
+                        <div class="interviewRecord">
+                            <h3>
+                                <a asp-controller="Applications"
+                                   asp-action="Details"
+                                   asp-route-id="@application.Id">
+                                    @application.CompanyName
+                                </a>
+                            </h3>
+                            <p>@application.JobTitle</p>
+                            <time datetime="@interviewTime.ToString("O", CultureInfo.InvariantCulture)">
+                                @interviewTime.ToString("dd MMM yyyy", displayCulture)
+                                at @interviewTime.ToString("HH:mm", displayCulture) SAST
+                            </time>
+                        </div>
+
+                        <a class="applicationCancel"
+                           asp-controller="Interviews"
+                           asp-action="Edit"
+                           asp-route-id="@application.Id"
+                           aria-label="Manage interview at @application.CompanyName for @application.JobTitle">
+                            Manage
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+}
