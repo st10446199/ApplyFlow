@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Export applications";
+}
+
+<link rel="stylesheet"
+      href="~/css/applicationForm.css"
+      asp-append-version="true" />
+
+<div class="applicationHeading">
+    <p class="eyebrow">Your application data</p>
+    <h1>Export applications</h1>
+    <p class="muted">
+        Download your applications as a CSV file for spreadsheets
+        or your own records.
+    </p>
+</div>
+
+<form asp-controller="Exports"
+      asp-action="Download"
+      method="post"
+      class="applicationForm">
+
+    <fieldset class="applicationSection">
+        <legend>Download your records</legend>
+
+        <p class="sectionDescription">
+            The file includes all your applications, newest added first.
+            Search filters on the Applications page do not limit this export.
+        </p>
+
+        <p class="sectionDescription">
+            Included information: company, job title, location, salary,
+            job URL, application date, status, notes, interview time,
+            follow-up date and record timestamps.
+        </p>
+
+        <p class="sectionDescription">
+            Dates use year, month and day order. Interview and record
+            timestamps are labelled UTC. Empty fields remain blank.
+        </p>
+
+        <p class="sectionDescription">
+            If you have no applications, the file will contain column
+            headings only.
+        </p>
+
+        <p class="sectionDescription">
+            Text that could be interpreted as a spreadsheet formula is
+            prefixed with an apostrophe in the export.
+        </p>
+    </fieldset>
+
+    <div class="applicationActions">
+        <a class="applicationCancel"
+           asp-controller="Applications"
+           asp-action="Index">
+            View applications
+        </a>
+
+        <button type="submit" class="applicationSubmit">
+            Download CSV
+        </button>
+    </div>
+</form>
