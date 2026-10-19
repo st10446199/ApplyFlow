@@ -1,6 +1,19 @@
-﻿@{
+﻿@model ApplyFlow.Web.ViewModels.DashboardViewModel
+@using ApplyFlow.Web.Enums
+@using System.Globalization
+
+@{
     ViewData["Title"] = "Dashboard";
+    var displayCulture = CultureInfo.GetCultureInfo("en-ZA");
 }
+
+<link rel="stylesheet"
+      href="~/css/applications.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/dashboard.css"
+      asp-append-version="true" />
 
 <section class="welcome">
     <div>
@@ -10,36 +23,20 @@
             Track your progress and keep your next step in sight.
         </p>
     </div>
-    <span class="stageBadge">Application tracking coming next</span>
+
+    <a class="applicationsPrimary"
+       asp-controller="Applications"
+       asp-action="Index">
+        View applications
+    </a>
 </section>
 
-<div class="previewNotice" role="note">
-    <strong>Sample dashboard</strong>
-    These fictional applications show the planned layout.
-    Accounts and saved records are not connected yet.
-</div>
-
-<section class="focusCard" aria-labelledby="focusTitle">
-    <div class="focusContent">
-        <span class="companyMark focusLogo" aria-hidden="true">C</span>
-        <div>
-            <p class="eyebrow">Next interview · Sample</p>
-            <h2 id="focusTitle">Get ready for Cedar Labs</h2>
-            <p>Graduate Software Developer</p>
-        </div>
-    </div>
-    <div class="focusDate">
-        <strong>22 October 2026</strong>
-        <span>10:00 SAST · Video interview</span>
-    </div>
-</section>
-
-<section class="statsGrid" aria-label="Sample application statistics">
+<section class="statsGrid" aria-label="Your application statistics">
     <article class="statCard">
         <span class="statIcon blue" aria-hidden="true">▤</span>
         <div>
             <h2>Total applications</h2>
-            <strong class="statValue">4</strong>
+            <strong class="statValue">@Model.TotalApplications</strong>
             <p>All tracked opportunities</p>
         </div>
     </article>
@@ -48,7 +45,7 @@
         <span class="statIcon teal" aria-hidden="true">↗</span>
         <div>
             <h2>Active applications</h2>
-            <strong class="statValue">2</strong>
+            <strong class="statValue">@Model.ActiveApplications</strong>
             <p>Applied, assessment or interview</p>
         </div>
     </article>
@@ -56,9 +53,9 @@
     <article class="statCard">
         <span class="statIcon amber" aria-hidden="true">▣</span>
         <div>
-            <h2>Upcoming interviews</h2>
-            <strong class="statValue">1</strong>
-            <p>Next: 22 October</p>
+            <h2>Saved opportunities</h2>
+            <strong class="statValue">@Model.SavedApplications</strong>
+            <p>Vacancies saved for later</p>
         </div>
     </article>
 
@@ -66,141 +63,191 @@
         <span class="statIcon green" aria-hidden="true">✓</span>
         <div>
             <h2>Offers</h2>
-            <strong class="statValue">1</strong>
-            <p>Ready for consideration</p>
+            <strong class="statValue">@Model.Offers</strong>
+            <p>Applications currently at offer stage</p>
         </div>
     </article>
 </section>
 
-<div class="dashboardGrid">
-    <section class="panel" aria-labelledby="statusTitle">
-        <div class="panelHeading">
-            <h2 id="statusTitle">Application status</h2>
-            <p>A snapshot of your progress</p>
+@if (Model.TotalApplications == 0)
+{
+    <section class="panel applicationsEmpty">
+        <span class="emptyApplicationIcon" aria-hidden="true">▤</span>
+        <h2>Start tracking your opportunities</h2>
+        <p>
+            Add your first application to see your progress here.
+            Your dashboard updates as you manage your applications.
+        </p>
+
+        <a class="applicationsPrimary"
+           asp-controller="Applications"
+           asp-action="Create">
+            Add your first application
+        </a>
+    </section>
+}
+else
+{
+    <div class="dashboardGrid">
+        <section class="panel" aria-labelledby="statusTitle">
+            <div class="panelHeading">
+                <h2 id="statusTitle">Application status</h2>
+                <p>Select a status to view its applications.</p>
+            </div>
+
+            <div class="statusSummary">
+                <strong>@Model.TotalApplications</strong>
+                <span class="muted">Total tracked</span>
+            </div>
+
+            <ul class="dashboardStatusList">
+                @foreach (var status in Enum.GetValues<ApplicationStatus>())
+                {
+                    var count = Model.CountFor(status);
+                    var statusClass = status.ToString().ToLowerInvariant();
+                    var percentage = Model.PercentageFor(status)
+                        .ToString("0.##", CultureInfo.InvariantCulture);
+
+                    <li>
+                        <a class="dashboardStatusLink"
+                           asp-controller="Applications"
+                           asp-action="Index"
+                           asp-route-status="@status"
+                           aria-label="@status applications: @count">
+                            <span class="badge @statusClass">@status</span>
+                            <strong>@count</strong>
+                        </a>
+
+                        <div class="dashboardStatusTrack" aria-hidden="true">
+                            <span class="dashboardStatusFill @statusClass"
+                                  style="width: @(percentage)%"></span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </section>
+
+        <section class="panel dashboardNextStep"
+                 aria-labelledby="nextStepTitle">
+            <div class="panelHeading">
+                <h2 id="nextStepTitle">Your next step</h2>
+                <p>Keep your job search moving.</p>
+            </div>
+
+            @if (Model.SavedApplications > 0)
+            {
+                <div class="dashboardActionContent">
+                    <span class="statIcon amber" aria-hidden="true">▣</span>
+                    <h3>Review your saved opportunities</h3>
+                    <p>
+                        You have @Model.SavedApplications
+                        @(Model.SavedApplications == 1 ? "opportunity" : "opportunities")
+                        marked as Saved. Review the role requirements and
+                        decide which applications to prepare next.
+                    </p>
+
+                    <a class="applicationsPrimary"
+                       asp-controller="Applications"
+                       asp-action="Index"
+                       asp-route-status="@ApplicationStatus.Saved">
+                        View saved opportunities
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="dashboardActionContent">
+                    <span class="statIcon teal" aria-hidden="true">↗</span>
+                    <h3>Keep your records up to date</h3>
+                    <p>
+                        Review your applications and update their statuses
+                        when you hear from employers. Add useful details
+                        to your notes so you can find them later.
+                    </p>
+
+                    <a class="applicationsPrimary"
+                       asp-controller="Applications"
+                       asp-action="Index">
+                        Review applications
+                    </a>
+                </div>
+            }
+
+            <p class="dashboardExplanation">
+                These totals show each application's current status.
+                They do not measure historical interview or offer rates.
+            </p>
+        </section>
+    </div>
+
+    <section class="panel recentPanel" aria-labelledby="recentTitle">
+        <div class="dashboardRecentHeading">
+            <div class="panelHeading">
+                <h2 id="recentTitle">Recent applications</h2>
+                <p>Your five most recently added opportunities.</p>
+            </div>
+
+            <a asp-controller="Applications"
+               asp-action="Index">
+                View all applications
+            </a>
         </div>
 
-        <div class="statusSummary">
-            <strong>4</strong>
-            <span class="muted">Total tracked</span>
-        </div>
+        <ul class="dashboardRecentList">
+            @foreach (var application in Model.RecentApplications)
+            {
+                var companyInitial =
+                    string.IsNullOrWhiteSpace(application.CompanyName)
+                        ? "?"
+                        : StringInfo.GetNextTextElement(
+                            application.CompanyName).ToUpperInvariant();
 
-        <div class="statusBar" aria-hidden="true">
-            <span class="barSaved"></span>
-            <span class="barApplied"></span>
-            <span class="barInterview"></span>
-            <span class="barOffer"></span>
-        </div>
+                var statusClass =
+                    application.Status.ToString().ToLowerInvariant();
 
-        <ul class="statusLegend" aria-label="Sample status totals">
-            <li><span class="badge saved">Saved</span><strong>1</strong></li>
-            <li><span class="badge applied">Applied</span><strong>1</strong></li>
-            <li><span class="badge interview">Interview</span><strong>1</strong></li>
-            <li><span class="badge offer">Offer</span><strong>1</strong></li>
+                <li class="dashboardRecentItem">
+                    <div class="dashboardRecentCompany">
+                        <span class="companyMark" aria-hidden="true">
+                            @companyInitial
+                        </span>
+
+                        <div class="dashboardRecentDescription">
+                            <h3>
+                                <a asp-controller="Applications"
+                                   asp-action="Details"
+                                   asp-route-id="@application.Id"
+                                   aria-label="View @application.JobTitle at @application.CompanyName">
+                                    @application.CompanyName
+                                </a>
+                            </h3>
+                            <p>@application.JobTitle</p>
+                            <p class="dashboardRecentLocation">
+                                @application.Location
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="dashboardRecentMeta">
+                        <span class="badge @statusClass">
+                            @application.Status
+                        </span>
+
+                        <p>
+                            <span>Application date:</span>
+                            @if (application.ApplicationDate is DateOnly date)
+                            {
+                                <time datetime="@date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                                    @date.ToString("dd MMM yyyy", displayCulture)
+                                </time>
+                            }
+                            else
+                            {
+                                <span>Not recorded</span>
+                            }
+                        </p>
+                    </div>
+                </li>
+            }
         </ul>
     </section>
-
-    <section class="panel" aria-labelledby="interviewTitle">
-        <div class="panelHeading">
-            <h2 id="interviewTitle">Upcoming interview</h2>
-            <p>Your next conversation</p>
-        </div>
-
-        <div class="interviewItem">
-            <div class="dateTile" aria-label="22 October">
-                <strong>22</strong>
-                <span>OCT</span>
-            </div>
-            <div>
-                <h3>Graduate Software Developer</h3>
-                <p class="muted">Cedar Labs · 10:00 SAST</p>
-                <span class="formatBadge">Video interview</span>
-            </div>
-        </div>
-
-        <p class="interviewTip">
-            Review your project examples and prepare questions about the role.
-        </p>
-    </section>
-</div>
-
-<section class="panel recentPanel" aria-labelledby="recentTitle">
-    <div class="panelHeading">
-        <h2 id="recentTitle">Recent applications</h2>
-        <p>Your latest opportunities</p>
-    </div>
-
-    <div class="applicationTable" role="region"
-         aria-label="Sample applications table" tabindex="0">
-        <table>
-            <caption class="visuallyHidden">
-                Four fictional job applications for the design preview
-            </caption>
-            <thead>
-                <tr>
-                    <th scope="col">Company and role</th>
-                    <th scope="col">Location</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Application date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div class="companyCell">
-                            <span class="companyMark" aria-hidden="true">C</span>
-                            <div>
-                                <strong>Cedar Labs</strong>
-                                <span>Graduate Software Developer</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>Pretoria · Hybrid</td>
-                    <td><span class="badge interview">Interview</span></td>
-                    <td><time datetime="2026-10-12">12 Oct 2026</time></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="companyCell">
-                            <span class="companyMark" aria-hidden="true">H</span>
-                            <div>
-                                <strong>Harbour Digital</strong>
-                                <span>Junior Web Developer</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>Cape Town · Remote</td>
-                    <td><span class="badge applied">Applied</span></td>
-                    <td><time datetime="2026-10-10">10 Oct 2026</time></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="companyCell">
-                            <span class="companyMark" aria-hidden="true">K</span>
-                            <div>
-                                <strong>Kopano Systems</strong>
-                                <span>Software Development Intern</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>Johannesburg · On site</td>
-                    <td><span class="badge saved">Saved</span></td>
-                    <td>Not applied</td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="companyCell">
-                            <span class="companyMark" aria-hidden="true">F</span>
-                            <div>
-                                <strong>Fynbos Software</strong>
-                                <span>Junior C# Developer</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>Pretoria · Hybrid</td>
-                    <td><span class="badge offer">Offer</span></td>
-                    <td><time datetime="2026-10-05">5 Oct 2026</time></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
+}
