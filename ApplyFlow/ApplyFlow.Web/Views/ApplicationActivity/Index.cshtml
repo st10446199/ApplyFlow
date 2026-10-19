@@ -1,0 +1,163 @@
+﻿@model ApplyFlow.Web.ViewModels.ApplicationActivityViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Application activity";
+
+    var culture = CultureInfo.GetCultureInfo("en-ZA");
+    var offset = TimeSpan.FromHours(2);
+    var today = DateOnly.FromDateTime(
+        DateTimeOffset.UtcNow.ToOffset(offset).DateTime);
+
+    var followUpMessage = "No follow-up date set.";
+
+    if (Model.FollowUpDate is DateOnly followUp)
+    {
+        followUpMessage = followUp < today
+            ? "Your follow-up is overdue."
+            : followUp == today
+                ? "Your follow-up is due today."
+                : "Your follow-up is upcoming.";
+    }
+}
+
+<link rel="stylesheet"
+      href="~/css/applications.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/applicationForm.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/applicationActivity.css"
+      asp-append-version="true" />
+
+<div class="applicationHeading">
+    <a asp-controller="Applications"
+       asp-action="Details"
+       asp-route-id="@Model.Id">
+        Back to application
+    </a>
+
+    <p class="eyebrow">@Model.CompanyName</p>
+    <h1>Application activity</h1>
+    <p class="muted activityRole">@Model.JobTitle</p>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="applicationsSuccess" role="status">
+        @successMessage
+    </div>
+}
+
+<form asp-controller="ApplicationActivity"
+      asp-action="Index"
+      asp-route-id="@Model.Id"
+      method="post"
+      class="applicationForm activityForm">
+
+    <input asp-for="Id" type="hidden" />
+
+    <div asp-validation-summary="All"
+         class="applicationErrors"
+         role="alert"></div>
+
+    <fieldset class="applicationSection">
+        <legend>Follow-up reminder</legend>
+
+        <p class="sectionDescription">
+            Choose a day to check progress or contact the employer.
+            Leave the date blank and save to clear the reminder.
+        </p>
+
+        <div class="applicationField">
+            <label asp-for="FollowUpDate"></label>
+
+            <input asp-for="FollowUpDate"
+                   asp-format="{0:yyyy-MM-dd}"
+                   type="date"
+                   min="2000-01-01"
+                   max="2100-12-31"
+                   aria-describedby="followUpHelp" />
+
+            <span asp-validation-for="FollowUpDate"></span>
+
+            <small id="followUpHelp">
+                Due dates use the current calendar day in South Africa.
+                No email or browser notification is sent.
+            </small>
+        </div>
+
+        <p class="activityReminder">@followUpMessage</p>
+    </fieldset>
+
+    <div class="applicationActions">
+        <button type="submit" class="applicationSubmit">
+            Save follow-up date
+        </button>
+    </div>
+</form>
+
+<section class="panel" aria-labelledby="historyTitle">
+    <div class="panelHeading">
+        <h2 id="historyTitle">Status history</h2>
+        <p>
+            Your latest 50 recorded entries, newest first.
+            Times are shown in SAST (UTC+02:00).
+        </p>
+    </div>
+
+    <p class="activityCurrent">
+        Current status:
+        <span class="badge @Model.Status.ToString().ToLowerInvariant()">
+            @Model.Status
+        </span>
+    </p>
+
+    @if (Model.History.Count == 0)
+    {
+        <p class="muted">
+            No history has been recorded yet. Status changes made
+            after this feature was added will appear here.
+        </p>
+    }
+    else
+    {
+        <ol class="activityHistory">
+            @foreach (var entry in Model.History)
+            {
+                var changedAt = entry.ChangedAt.ToOffset(offset);
+
+                <li>
+                    <div>
+                        @if (entry.PreviousStatus.HasValue)
+                        {
+                            <strong>
+                                @entry.PreviousStatus.Value to @entry.NewStatus
+                            </strong>
+                        }
+                        else
+                        {
+                            <strong>Application created as @entry.NewStatus</strong>
+                        }
+                    </div>
+
+                    <time datetime="@changedAt.ToString("O", CultureInfo.InvariantCulture)">
+                        @changedAt.ToString("dd MMM yyyy, HH:mm", culture) SAST
+                    </time>
+                </li>
+            }
+        </ol>
+    }
+
+    <p class="activityHistoryNote">
+        Earlier changes cannot be reconstructed. This is a record of
+        saved status changes, not a complete audit of every application edit.
+    </p>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

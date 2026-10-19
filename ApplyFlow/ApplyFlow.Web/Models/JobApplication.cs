@@ -64,9 +64,12 @@ namespace ApplyFlow.Web.Models
         [StringLength(5000)]
         public string? Notes { get; set; }
 
-        // An offset preserves the scheduled instant across time zones.
         [Display(Name = "Interview date and time")]
         public DateTimeOffset? InterviewAt { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Follow-up date")]
+        public DateOnly? FollowUpDate { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
             = DateTimeOffset.UtcNow;
@@ -101,9 +104,9 @@ namespace ApplyFlow.Web.Models
                     UriKind.Absolute,
                     out var uri);
 
-                if (!isValidUrl ||
-                    (uri!.Scheme != Uri.UriSchemeHttp &&
-                     uri.Scheme != Uri.UriSchemeHttps))
+                if (!isValidUrl
+                    || (uri!.Scheme != Uri.UriSchemeHttp
+                        && uri.Scheme != Uri.UriSchemeHttps))
                 {
                     yield return new ValidationResult(
                         "Enter a full job URL starting with http:// or https://.",

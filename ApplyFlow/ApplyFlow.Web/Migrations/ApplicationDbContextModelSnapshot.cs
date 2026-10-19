@@ -22,6 +22,33 @@ namespace ApplyFlow.Web.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ApplyFlow.Web.Models.ApplicationStatusHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("ChangedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("JobApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PreviousStatus")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobApplicationId", "ChangedAt");
+
+                    b.ToTable("ApplicationStatusHistories");
+                });
+
             modelBuilder.Entity("ApplyFlow.Web.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -115,6 +142,9 @@ namespace ApplyFlow.Web.Migrations
                         .HasMaxLength(3)
                         .IsUnicode(false)
                         .HasColumnType("varchar(3)");
+
+                    b.Property<DateOnly?>("FollowUpDate")
+                        .HasColumnType("date");
 
                     b.Property<DateTimeOffset?>("InterviewAt")
                         .HasColumnType("datetimeoffset");
@@ -293,6 +323,17 @@ namespace ApplyFlow.Web.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("ApplyFlow.Web.Models.ApplicationStatusHistory", b =>
+                {
+                    b.HasOne("ApplyFlow.Web.Models.JobApplication", "JobApplication")
+                        .WithMany()
+                        .HasForeignKey("JobApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobApplication");
                 });
 
             modelBuilder.Entity("ApplyFlow.Web.Models.JobApplication", b =>

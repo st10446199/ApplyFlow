@@ -6,6 +6,7 @@
 
     var displayCulture = CultureInfo.GetCultureInfo("en-ZA");
     var statusClass = Model.Status.ToString().ToLowerInvariant();
+    var offset = TimeSpan.FromHours(2);
 
     var salaryText = "Not recorded";
 
@@ -33,8 +34,11 @@
         && (jobUri.Scheme == Uri.UriSchemeHttp
             || jobUri.Scheme == Uri.UriSchemeHttps);
 
-    var createdAtUtc = Model.CreatedAt.ToUniversalTime();
-    var updatedAtUtc = Model.UpdatedAt.ToUniversalTime();
+    var createdAt = Model.CreatedAt.ToOffset(offset);
+    var updatedAt = Model.UpdatedAt.ToOffset(offset);
+
+    var today = DateOnly.FromDateTime(
+        DateTimeOffset.UtcNow.ToOffset(offset).DateTime);
 }
 
 <link rel="stylesheet"
@@ -47,6 +51,10 @@
 
 <link rel="stylesheet"
       href="~/css/applicationDelete.css"
+      asp-append-version="true" />
+
+<link rel="stylesheet"
+      href="~/css/applicationActivity.css"
       asp-append-version="true" />
 
 <a class="detailsBack"
@@ -89,6 +97,20 @@
         </a>
     </div>
 </header>
+
+<nav class="detailsTrackingLinks" aria-label="Application tracking">
+    <a asp-controller="ApplicationActivity"
+       asp-action="Index"
+       asp-route-id="@Model.Id">
+        Status history and follow-up
+    </a>
+
+    <a asp-controller="Interviews"
+       asp-action="Edit"
+       asp-route-id="@Model.Id">
+        Manage interview
+    </a>
+</nav>
 
 <div class="applicationDetailsGrid">
     <section class="panel" aria-labelledby="informationTitle">
@@ -137,6 +159,50 @@
                 <dt>Salary</dt>
                 <dd>@salaryText</dd>
             </div>
+
+            <div>
+                <dt>Interview</dt>
+                <dd>
+                    @if (Model.InterviewAt is DateTimeOffset interviewAt)
+                    {
+                        var localInterview = interviewAt.ToOffset(offset);
+
+                        <time datetime="@localInterview.ToString("O", CultureInfo.InvariantCulture)">
+                            @localInterview.ToString("dd MMM yyyy, HH:mm", displayCulture)
+                            SAST
+                        </time>
+                    }
+                    else
+                    {
+                        <span>Not scheduled</span>
+                    }
+                </dd>
+            </div>
+
+            <div>
+                <dt>Follow-up date</dt>
+                <dd>
+                    @if (Model.FollowUpDate is DateOnly followUp)
+                    {
+                        <time datetime="@followUp.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                            @followUp.ToString("dd MMM yyyy", displayCulture)
+                        </time>
+
+                        if (followUp < today)
+                        {
+                            <span> · Overdue</span>
+                        }
+                        else if (followUp == today)
+                        {
+                            <span> · Due today</span>
+                        }
+                    }
+                    else
+                    {
+                        <span>Not set</span>
+                    }
+                </dd>
+            </div>
         </dl>
 
         <div class="detailsJobLink">
@@ -184,9 +250,9 @@
             <div>
                 <dt>Added to ApplyFlow</dt>
                 <dd>
-                    <time datetime="@createdAtUtc.ToString("O", CultureInfo.InvariantCulture)">
-                        @createdAtUtc.ToString("dd MMM yyyy, HH:mm", displayCulture)
-                        UTC
+                    <time datetime="@createdAt.ToString("O", CultureInfo.InvariantCulture)">
+                        @createdAt.ToString("dd MMM yyyy, HH:mm", displayCulture)
+                        SAST
                     </time>
                 </dd>
             </div>
@@ -194,9 +260,9 @@
             <div>
                 <dt>Last updated</dt>
                 <dd>
-                    <time datetime="@updatedAtUtc.ToString("O", CultureInfo.InvariantCulture)">
-                        @updatedAtUtc.ToString("dd MMM yyyy, HH:mm", displayCulture)
-                        UTC
+                    <time datetime="@updatedAt.ToString("O", CultureInfo.InvariantCulture)">
+                        @updatedAt.ToString("dd MMM yyyy, HH:mm", displayCulture)
+                        SAST
                     </time>
                 </dd>
             </div>
