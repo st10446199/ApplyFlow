@@ -99,6 +99,10 @@ namespace ApplyFlow.Web.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Skills")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 

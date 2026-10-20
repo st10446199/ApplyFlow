@@ -1,0 +1,96 @@
+﻿@model ApplyFlow.Web.ViewModels.SkillsProfileViewModel
+
+@{
+    ViewData["Title"] = "My skills";
+}
+
+<link rel="stylesheet"
+      href="~/css/applicationForm.css"
+      asp-append-version="true" />
+
+<div class="applicationHeading">
+    <p class="eyebrow">Your skills profile</p>
+    <h1>My skills</h1>
+    <p class="muted">
+        Keep a list of the skills you can bring to your next role.
+    </p>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="applicationSuccess" role="status">
+        @successMessage
+    </div>
+}
+
+<form asp-controller="Profiles"
+      asp-action="Index"
+      method="post"
+      class="applicationForm">
+
+    <div asp-validation-summary="All"
+         class="applicationErrors"
+         role="alert"></div>
+
+    <fieldset class="applicationSection">
+        <legend>Your skills</legend>
+
+        <p class="sectionDescription">
+            Include technologies, tools and professional skills that
+            you can explain or demonstrate. Enter one skill per line.
+        </p>
+
+        <div class="applicationField">
+            <label asp-for="Skills"></label>
+
+            <textarea asp-for="Skills"
+                      rows="12"
+                      maxlength="4000"
+                      spellcheck="false"
+                      placeholder="C#&#10;ASP.NET Core MVC&#10;SQL&#10;Kotlin&#10;Git&#10;Software testing"
+                      aria-describedby="skillsHelp"></textarea>
+
+            <span asp-validation-for="Skills"></span>
+
+            <small id="skillsHelp">
+                Up to 50 skills, with a maximum of 80 characters per
+                skill and 4,000 characters overall. Duplicate skills
+                and blank lines are removed when you save.
+            </small>
+        </div>
+    </fieldset>
+
+    <fieldset class="applicationSection">
+        <legend>About your profile</legend>
+
+        <p class="sectionDescription">
+            This list is private to your account. Saving it does not
+            send it to an AI service.
+        </p>
+
+        <p class="sectionDescription">
+            Your skills are self-reported. This page does not assess
+            proficiency or verify qualifications.
+        </p>
+
+        <p class="sectionDescription">
+            To clear your skills, remove all the text and save.
+        </p>
+    </fieldset>
+
+    <div class="applicationActions">
+        <a class="applicationCancel"
+           asp-controller="Home"
+           asp-action="Index">
+            Back to dashboard
+        </a>
+
+        <button class="applicationSubmit" type="submit">
+            Save skills
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -8,5 +8,8 @@ namespace ApplyFlow.Web.Models
         [Required]
         [StringLength(80)]
         public string DisplayName { get; set; } = string.Empty;
+
+        [StringLength(4000)]
+        public string? Skills { get; set; }
     }
 }

@@ -8,9 +8,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] | ApplyFlow</title>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/accountMenu.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ApplyFlow.Web.styles.css" asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/css/accountMenu.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/ApplyFlow.Web.styles.css"
+          asp-append-version="true" />
 </head>
 <body>
     @{
@@ -23,15 +32,22 @@
         var isDashboard =
             currentController == "Home" && currentAction == "Index";
 
-        var isApplications = currentController == "Applications";
+        var isApplications =
+            currentController == "Applications"
+            || currentController == "ApplicationActivity";
 
         var isApplicationsList =
-            isApplications && currentAction == "Index";
+            currentController == "Applications"
+            && currentAction == "Index";
 
         var isInterviews = currentController == "Interviews";
 
         var isInterviewsList =
             isInterviews && currentAction == "Index";
+
+        var isProfiles = currentController == "Profiles";
+
+        var isExports = currentController == "Exports";
 
         var currentUser = User.Identity?.IsAuthenticated == true
             ? await UserManager.GetUserAsync(User)
@@ -73,6 +89,22 @@
                aria-current="@(isInterviewsList ? "page" : null)">
                 <span aria-hidden="true">▣</span>
                 Interviews
+            </a>
+
+            <a class="navLink @(isProfiles ? "active" : "")"
+               asp-controller="Profiles"
+               asp-action="Index"
+               aria-current="@(isProfiles ? "page" : null)">
+                <span aria-hidden="true">✓</span>
+                My skills
+            </a>
+
+            <a class="navLink @(isExports ? "active" : "")"
+               asp-controller="Exports"
+               asp-action="Index"
+               aria-current="@(isExports ? "page" : null)">
+                <span aria-hidden="true">↓</span>
+                Export
             </a>
         </nav>
 
@@ -129,6 +161,18 @@
                    asp-action="Index"
                    aria-current="@(isInterviewsList ? "page" : null)">
                     Interviews
+                </a>
+
+                <a asp-controller="Profiles"
+                   asp-action="Index"
+                   aria-current="@(isProfiles ? "page" : null)">
+                    My skills
+                </a>
+
+                <a asp-controller="Exports"
+                   asp-action="Index"
+                   aria-current="@(isExports ? "page" : null)">
+                    Export
                 </a>
             </nav>
         </details>
